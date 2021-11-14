@@ -1,15 +1,22 @@
 <script>
-	import Card from "./Card.svelte";
+import Login from "./Login.svelte";
+import MainPage from "./MainPage.svelte";
 
-
-	export let name;
+	let loggedin = false;
+	function toggleLoggedIn() {
+		loggedin = !loggedin;
+	}
 </script>
 
-<main>
-	<h1 class="text-yellow-400">Hello {name}!</h1>
-	<p>Visit the <a href="https://svelte.dev/tutorial">Svelte tutorial</a> to learn how to build Svelte apps.</p>
-	<Card title="Test" text="123"></Card>
-	<Card title="Test 2" text="Hello, world!"></Card>
+<main class="bg-banner bg-cover bg-center h-screen">
+	<button on:click={toggleLoggedIn}>
+		toggle
+	</button>
+	{#if loggedin}
+		<MainPage></MainPage>
+	{:else}
+		<Login></Login>
+	{/if}
 </main>
 
 <style global lang="postcss">

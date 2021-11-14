@@ -8,7 +8,11 @@ module.exports = {
   },
   darkMode: false, // or 'media' or 'class'
   theme: {
-    extend: {},
+    extend: {
+      backgroundImage:{
+        "banner":"url('/img/Banner.jpg')"
+      }
+    },
   },
   variants: {
     extend: {},
