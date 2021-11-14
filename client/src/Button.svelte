@@ -1,11 +1,18 @@
 <script>
-	export let title;
-	export let text;
+
 </script>
 
 <main>
-	<figure class="bg-gray-100 rounded-xl p-3 m-2">
-		<h1 class="text-lg font-bold">{title}</h1>
-		<p class="text-gray-900">{text}</p>
-	</figure>
+	<button on:click class="rounded-2xl p-6 w-full text-center text-3xl text-gray-50">
+		<slot></slot>
+	</button>
 </main>
+
+<style>
+	button{
+		background: linear-gradient(272.39deg, rgba(247, 175, 67, 0.93) -34.2%, rgba(245, 72, 17, 0.93) 100%);
+		box-shadow: 0px 8px 4px rgba(0, 0, 0, 0.25);
+		border-radius: 20px;
+	}
+
+</style>

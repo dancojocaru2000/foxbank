@@ -11,7 +11,13 @@ module.exports = {
     extend: {
       backgroundImage:{
         "banner":"url('/img/Banner.jpg')"
-      }
+      },
+
+      fontFamily:{
+        "title":['Geo', 'sans-serif'],
+        "welcome":['Rochester', 'cursive'],
+        "sans":['Roboto', 'sans-serif']
+      },
     },
   },
   variants: {

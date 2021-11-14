@@ -8,18 +8,18 @@ import MainPage from "./MainPage.svelte";
 	}
 </script>
 
-<main class="bg-banner bg-cover bg-center h-screen">
-	<button on:click={toggleLoggedIn}>
-		toggle
-	</button>
+<main class="bg-banner bg-cover bg-center h-screen font-sans">
 	{#if loggedin}
 		<MainPage></MainPage>
 	{:else}
-		<Login></Login>
+		<Login on:loginSuccess={toggleLoggedIn}></Login>
 	{/if}
 </main>
 
 <style global lang="postcss">
+	
+	@import url('https://fonts.googleapis.com/css2?family=Geo&family=Roboto&family=Rochester&display=swap');
+
 	@tailwind base;
 	@tailwind components;
 	@tailwind utilities;
