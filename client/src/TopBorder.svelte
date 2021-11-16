@@ -4,7 +4,7 @@
 
 <main>
 	<div >
-        <h1 class="font-title text-7xl text-gray-50">FOXBANK</h1>
+        <h1 class="font-title text-7xl text-gray-50 mx-8">FOXBANK</h1>
     </div>
 </main>
 
