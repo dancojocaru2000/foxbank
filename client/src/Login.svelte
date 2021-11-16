@@ -1,5 +1,5 @@
 <script>
-import Button from "./Button.svelte";
+    import Button from "./Button.svelte";
 
     import CardBG from "./CardBG.svelte";
     import InputField from "./InputField.svelte";
@@ -17,9 +17,9 @@ import Button from "./Button.svelte";
 
 </script>
 
-<main>
-    <div class="container h-screen flex flex-col justify-center">
-        <CardBG width="464px" height="550px" class="flex flex-col items-stretch">
+<main class="h-full">
+    <div class="h-full flex flex-col justify-center items-center md:items-start">
+        <CardBG class="flex flex-col items-stretch">
             <h1 class='font-welcome text-7xl text-gray-50 m-6 border-b-2'>Welcome,</h1>
             <div class="m-3 flex-shrink">
                 <InputField placeholder="Username" isPassword={false} value={username}></InputField>

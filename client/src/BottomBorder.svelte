@@ -1,21 +1,16 @@
 <script>
-
+    let clazz;
+    export {clazz as class};
 </script>
 
-<main>
-	<div >
+<main class={clazz}>
 
-    </div>
 </main>
 
 <style>
-	div{
+	main{
         width:100%;
         height:80px;
-        background:#00f;
-        position:fixed;
-        bottom:0;
-        left:0;
         
         background: linear-gradient(270.31deg, rgba(38, 77, 89, 0.7) 21.94%, rgba(38, 77, 89, 0) 89.29%);
     }

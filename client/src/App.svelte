@@ -11,14 +11,16 @@ import TopBorder from "./TopBorder.svelte";
 	}
 </script>
 
-<main class="bg-banner bg-cover bg-center h-screen font-sans">
-	<TopBorder></TopBorder>
-	<BottomBorder></BottomBorder>
-	{#if loggedin}
-		<MainPage on:logOut={toggleLoggedIn}></MainPage>
-	{:else}
-		<Login on:loginSuccess={toggleLoggedIn}></Login>
-	{/if}
+<main class="flex flex-col items-stretch bg-banner bg-cover bg-center h-screen font-sans">
+	<TopBorder class="flex-shrink"></TopBorder>
+	<div class="flex-grow">
+		{#if loggedin}
+			<MainPage on:logOut={toggleLoggedIn}></MainPage>
+		{:else}
+			<Login on:loginSuccess={toggleLoggedIn}></Login>
+		{/if}
+	</div>
+	<BottomBorder class="flex-shrink"></BottomBorder>
 </main>
 
 <svelte:head>

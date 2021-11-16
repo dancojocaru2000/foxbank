@@ -1,19 +1,17 @@
 <script>
-	export let width;
-	export let height;
+	export let width = "inherit";
+	export let height = "inherit";
 
 	let clazz;
 	export {clazz as class}
 </script>
 
-<main>
-	<figure class="rounded-x p-3 m-14 {clazz}" style="--width: {width}; --height: {height};">
-		<slot></slot>
-	</figure>
+<main class="rounded-x p-3 m-14 {clazz}" style="--width: {width}; --height: {height};">
+	<slot></slot>
 </main>
 
 <style>
-	figure{
+	main {
 		width: var(--width);
 		height: var(--height);
 
