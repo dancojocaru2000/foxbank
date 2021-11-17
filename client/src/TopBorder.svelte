@@ -1,21 +1,16 @@
 <script>
-
+    let clazz;
+    export {clazz as class};
 </script>
 
-<main>
-	<div >
-        <h1 class="font-title text-7xl text-gray-50">FOXBANK</h1>
-    </div>
+<main class={clazz}>
+    <h1 class="font-title text-7xl text-gray-50 m-8">FOXBANK</h1>
 </main>
 
 <style>
-	div{
+	main{
         width:100%;
         height:80px;
-        background:#00f;
-        position:fixed;
-        top:0;
-        left:0;
         
         background: linear-gradient(90.12deg, rgba(38, 77, 89, 0.7) 19.7%, rgba(38, 77, 89, 0) 93.77%);
     }
