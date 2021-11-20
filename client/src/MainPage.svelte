@@ -13,6 +13,36 @@ import AccountCard from './AccountCard.svelte';
     let accountnr = "2";
     let maincurrency = "RON";
 
+    let accounts = [
+        {type:"RON Account", currency:"RON", balance:"420,42", iban:"RONFOX62188921", isExpanded: false, 
+            transactions: [
+                {title:"Transaction Name#1", status:"PROCESSED", amount:"-45,09", time:"15:38 27/11/2021", type:"send"},
+                {title:"Transaction Name#2", status:"PENDING", amount:"+25,00", time:"15:38 27/11/2021", type:"received"},
+                {title:"Transaction Name#3", status:"CANCELLED", amount:"-469,09", time:"15:38 27/11/2021", type:"send"},
+                {title:"Transaction Name#1", status:"PROCESSED", amount:"-45,09", time:"15:38 27/11/2021", type:"send"},
+                {title:"Transaction Name#2", status:"PENDING", amount:"+25,00", time:"15:38 27/11/2021", type:"received"},
+                {title:"Transaction Name#3", status:"CANCELLED", amount:"-469,09", time:"15:38 27/11/2021", type:"send"},
+                {title:"Transaction Name#1", status:"PROCESSED", amount:"-45,09", time:"15:38 27/11/2021", type:"send"},
+                {title:"Transaction Name#2", status:"PENDING", amount:"+25,00", time:"15:38 27/11/2021", type:"received"},
+                {title:"Transaction Name#3", status:"CANCELLED", amount:"-469,09", time:"15:38 27/11/2021", type:"send"},
+                {title:"Transaction Name#1", status:"PROCESSED", amount:"-45,09", time:"15:38 27/11/2021", type:"send"},
+                {title:"Transaction Name#2", status:"PENDING", amount:"+25,00", time:"15:38 27/11/2021", type:"received"},
+                {title:"Transaction Name#3", status:"CANCELLED", amount:"-469,09", time:"15:38 27/11/2021", type:"send"},
+                {title:"Transaction Name#1", status:"PROCESSED", amount:"-45,09", time:"15:38 27/11/2021", type:"send"},
+                {title:"Transaction Name#2", status:"PENDING", amount:"+25,00", time:"15:38 27/11/2021", type:"received"},
+                {title:"Transaction Name#3", status:"CANCELLED", amount:"-469,09", time:"15:38 27/11/2021", type:"send"},
+            ]
+        }, 
+        {type:"EUR Account", currency:"EUR", balance:"620,42", iban:"EURFOX62188921", isExpanded: false, 
+            transactions: [
+                {title:"Transaction Name#1", status:"PROCESSED", amount:"-45,09", time:"15:38 27/11/2021", type:"send"},
+                {title:"Transaction Name#2", status:"PENDING", amount:"+25,00", time:"15:38 27/11/2021", type:"received"},
+                {title:"Transaction Name#3", status:"CANCELLED", amount:"-469,09", time:"15:38 27/11/2021", type:"send"},
+            ]
+        },
+    ];
+    let expandedAccount = null;
+
     function dispatchLogout(){
         //todo: CHeck here 
         dispatch("logOut",null);
@@ -23,8 +53,7 @@ import AccountCard from './AccountCard.svelte';
         dispatch("showNotifications",null);
     }
 
-    let accounts = [{}, {}];
-    let expandedAccount = null;
+   
 
     function expanded(index) {
         if (!expandedAccount && expandedAccount !== 0) {
@@ -40,10 +69,10 @@ import AccountCard from './AccountCard.svelte';
 <main class="h-full flex flex-col items-stretch md:flex-row">
     <div class="flex flex-col items-stretch max-h-full">
         {#if expandedAccount || expandedAccount === 0}
-            <AccountCard balance="{expandedAccount}" isExpanded={true} on:expanded={() => expanded(null)}></AccountCard>
+            <AccountCard type={accounts[expandedAccount].type} currency={accounts[expandedAccount].currency} balance={accounts[expandedAccount].balance} iban={accounts[expandedAccount].iban} transactions={accounts[expandedAccount].transactions} isExpanded={true} on:expanded={() => expanded(null)}></AccountCard>
         {:else}
             {#each accounts as account,i}
-                <AccountCard balance="{i}" isExpanded={false} on:expanded={() => expanded(i)}></AccountCard>
+                <AccountCard type={account.type} currency={account.currency} balance={account.balance} iban={account.iban} transactions={account.transactions} isExpanded={false} on:expanded={() => expanded(i)}></AccountCard>
             {/each}
         {/if}
     </div>

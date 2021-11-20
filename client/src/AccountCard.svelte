@@ -15,27 +15,7 @@
     export let balance="5425";
     export let iban="RONFOX62188921";
     export let isExpanded=false;
-    export let transactions=[
-        {title:"Transaction Name#1", status:"PROCESSED", amount:"-45,09", time:"15:38 27/11/2021", type:"send"},
-        {title:"Transaction Name#2", status:"PENDING", amount:"+25,00", time:"15:38 27/11/2021", type:"received"},
-        {title:"Transaction Name#3", status:"CANCELLED", amount:"-469,09", time:"15:38 27/11/2021", type:"send"},
-        {title:"Transaction Name#1", status:"PROCESSED", amount:"-45,09", time:"15:38 27/11/2021", type:"send"},
-        {title:"Transaction Name#2", status:"PENDING", amount:"+25,00", time:"15:38 27/11/2021", type:"received"},
-        {title:"Transaction Name#3", status:"CANCELLED", amount:"-469,09", time:"15:38 27/11/2021", type:"send"},
-        {title:"Transaction Name#1", status:"PROCESSED", amount:"-45,09", time:"15:38 27/11/2021", type:"send"},
-        {title:"Transaction Name#2", status:"PENDING", amount:"+25,00", time:"15:38 27/11/2021", type:"received"},
-        {title:"Transaction Name#3", status:"CANCELLED", amount:"-469,09", time:"15:38 27/11/2021", type:"send"},
-        {title:"Transaction Name#1", status:"PROCESSED", amount:"-45,09", time:"15:38 27/11/2021", type:"send"},
-        {title:"Transaction Name#2", status:"PENDING", amount:"+25,00", time:"15:38 27/11/2021", type:"received"},
-        {title:"Transaction Name#3", status:"CANCELLED", amount:"-469,09", time:"15:38 27/11/2021", type:"send"},
-        {title:"Transaction Name#1", status:"PROCESSED", amount:"-45,09", time:"15:38 27/11/2021", type:"send"},
-        {title:"Transaction Name#2", status:"PENDING", amount:"+25,00", time:"15:38 27/11/2021", type:"received"},
-        {title:"Transaction Name#3", status:"CANCELLED", amount:"-469,09", time:"15:38 27/11/2021", type:"send"},
-        {title:"Transaction Name#1", status:"PROCESSED", amount:"-45,09", time:"15:38 27/11/2021", type:"send"},
-        {title:"Transaction Name#2", status:"PENDING", amount:"+25,00", time:"15:38 27/11/2021", type:"received"},
-        {title:"Transaction Name#3", status:"CANCELLED", amount:"-469,09", time:"15:38 27/11/2021", type:"send"},
-        {title:"Transaction Name#4", status:"DECLINED", amount:"+469,09", time:"15:38 27/11/2021", type:"received"},
-    ];
+    export let transactions=[];
 
     function copyIban(){
         //todo: Code here 
@@ -63,16 +43,16 @@
         <div class="flex flex-col">
 
             <div>
-                <DetailField class="py-2 mt-4 flex-shrink">
-                    <h2 class='font-sans ml-4 text-4xl text-gray-50'>Balance: <span style="color: #264D59">{balance}</span>{currency}</h2>
+                <DetailField class="p-1  flex-shrink">
+                    <h2 class='font-sans mt-3 mb-2 pl-2 text-4xl text-gray-50'>Balance: <span style="color: #264D59">{balance}</span>{currency}</h2>
                 </DetailField>
             </div>
 
-            <div class="flex flex-col flex-grow max-h-full relative {isExpanded ? "overflow-auto" : ""}">
+            <div class="flex flex-col flex-grow pr-2 max-h-full relative scroller {isExpanded ? "overflow-auto overflow-x-hidden" : ""}">
 
                 {#if isExpanded }
                     {#each transactions as transaction}
-                        <DetailField class="my-3 py-1 flex-shrink">   
+                        <DetailField class="my-3 py-1 flex-shrink min-w-transaction">   
                             <div class='font-sans text-gray-50 mt-2 mx-4 border-b-1'>
                                 <h3 class="inline mr-3">{transaction.title}: </h3>
                                 <span class="text-4xl {transaction.type == "send" ?  "text-red-c" : "text-lime-c"}">{transaction.amount}</span>
@@ -172,3 +152,32 @@
     </div>
     
 </CardBG>
+
+<style>
+    /* width */
+::-webkit-scrollbar {
+  width: 3px;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+  box-shadow: inset 0 0 2px rgba(141, 140, 140, 0.281); 
+  border-radius: 10px;
+}
+ 
+/* Handle */
+::-webkit-scrollbar-thumb {
+  background: rgba(238, 236, 236, 0.897); 
+  border-radius: 10px;
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(182, 182, 182, 0.918); 
+}
+
+.scroller {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(238, 236, 236, 0.897) rgba(141, 140, 140, 0.281);
+}
+</style>
