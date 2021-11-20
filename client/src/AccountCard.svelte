@@ -6,6 +6,9 @@
     import DetailField from './DetailField.svelte';
     import GreenButton from './GreenButton.svelte';
     import {createEventDispatcher} from 'svelte';
+    import { fade, fly, slide } from 'svelte/transition';
+	import { flip } from 'svelte/animate';
+
 
     const dispatch = createEventDispatcher();
 
@@ -17,26 +20,42 @@
     export let isExpanded=false;
     export let transactions=[];
 
+    let copied = false;
+
     function copyIban(){
-        //todo: Code here 
-        dispatch("copiedIban",null);
+        if(!copied){
+            navigator.clipboard.writeText(iban)
+            .then(() => copied = true)
+            .then(() => setTimeout(() => {
+                copied = false;
+            }, 1000));
+        }
     }
 
     function expand(){
         //todo: Code here 
         dispatch("expanded",isExpanded);
     }
+
+    function send(){
+        //todo: CHeck here 
+        dispatch("createPopup",{
+            type: 'send_money',
+            iban,
+        });
+    }
 </script>
 
-<CardBG class="flex-shrink flex flex-col items-stretch md:self-start px-6 pt-6 pb-0 max-h-full overflow-clip min-h-0">
+ 
+<CardBG class="flex-shrink flex flex-col items-stretch md:self-start mt-16 mb-6 px-6 pt-6 pb-0 max-h-full overflow-clip min-h-0">
     <div class="flex flex-col flex-shrink">
         <div class='font-sans  mt-2 mx-2 border-b-1'>
             <h3 class="text-gray-50 inline mr-4">{type}</h3>
             <span class="text-gray-100">IBAN: {iban}</span>
-            <button on:click={copyIban} class="inline"> <Icon icon="akar-icons:copy" color="rgba(249, 250, 251, 1)"/></button>
+            <button on:click={copyIban} class="inline {copied ? "cursor-default" : ""}"> <Icon icon={copied ? "akar-icons:check" : "akar-icons:copy"} color="rgba(249, 250, 251, 1)"/></button>
         </div>
         
-        <div class="w-full max-w-sm self-start border-solid border-gray-50 border mb-2"></div>
+        <div class="w-full max-w-sm self-start border-solid border-gray-50 border mb-3"></div>
     </div>
 
     <div class="flex flex-row flex-grow max-h-full min-h-0">
@@ -51,37 +70,40 @@
             <div class="flex flex-col flex-grow pr-2 max-h-full relative scroller {isExpanded ? "overflow-auto overflow-x-hidden" : ""}">
 
                 {#if isExpanded }
-                    {#each transactions as transaction}
-                        <DetailField class="my-3 py-1 flex-shrink min-w-transaction">   
-                            <div class='font-sans text-gray-50 mt-2 mx-4 border-b-1'>
-                                <h3 class="inline mr-3">{transaction.title}: </h3>
-                                <span class="text-4xl {transaction.type == "send" ?  "text-red-c" : "text-lime-c"}">{transaction.amount}</span>
-                                <span class="text-4xl">{currency}</span>
-                            </div>
-                            <div class='font-sans text-2xl text-gray-100 mt-2 mx-6 border-b-1'>
-                                <p class="inline">at {transaction.time} </p>
+                    {#each transactions as transaction,i (i)}
+                        <div in:slide={{delay:100*i}} out:slide={{delay:50*(transactions.length-i)}}>
+                    
+                            <DetailField class="my-3 py-1 flex-shrink min-w-transaction">   
+                                <div class='font-sans text-gray-50 mt-2 mx-4 border-b-1'>
+                                    <h3 class="inline mr-3">{transaction.title}: </h3>
+                                    <span class="text-4xl {transaction.type == "send" ?  "text-red-c" : "text-lime-c"}">{transaction.amount}</span>
+                                    <span class="text-4xl">{currency}</span>
+                                </div>
+                                <div class='font-sans text-2xl text-gray-100 mt-2 mx-6 border-b-1'>
+                                    <p class="inline">at {transaction.time} </p>
 
-                                {#if transaction.status == "PROCESSED"}
-                                    <span>
-                                        <Icon class="inline mb-1" icon="akar-icons:circle-check" color="#6DE25ACC"/>
-                                    </span>
-                                {:else if  transaction.status == "PENDING"}
-                                    <span>
-                                        <Icon class="inline mb-1" icon="akar-icons:arrow-cycle" color="#F6AF43"/>
-                                    </span>
-                                {:else if  transaction.status == "CANCELLED"}
-                                    <span>
-                                        <Icon class="inline mb-1" icon="akar-icons:circle-x" color="#F7630C"/>
-                                    </span>
-                                {:else}
-                                    <span>
-                                        <Icon class="inline mb-1" icon="akar-icons:triangle-alert" color="#F7630C"/>
-                                    </span>
-                                {/if}
-                                {transaction.status}
-                                
-                            </div>
-                        </DetailField> 
+                                    {#if transaction.status == "PROCESSED"}
+                                        <span>
+                                            <Icon class="inline mb-1" icon="akar-icons:circle-check" color="#6DE25ACC"/>
+                                        </span>
+                                    {:else if  transaction.status == "PENDING"}
+                                        <span>
+                                            <Icon class="inline mb-1" icon="akar-icons:arrow-cycle" color="#F6AF43"/>
+                                        </span>
+                                    {:else if  transaction.status == "CANCELLED"}
+                                        <span>
+                                            <Icon class="inline mb-1" icon="akar-icons:circle-x" color="#F7630C"/>
+                                        </span>
+                                    {:else}
+                                        <span>
+                                            <Icon class="inline mb-1" icon="akar-icons:triangle-alert" color="#F7630C"/>
+                                        </span>
+                                    {/if}
+                                    {transaction.status}
+                                    
+                                </div>
+                            </DetailField> 
+                        </div>
                     {/each}
                     
                 {:else if transactions.length > 0}
@@ -132,7 +154,7 @@
 
         <div class="flex flex-col flex-shrink">
 
-            <GreenButton class="mx-8">
+            <GreenButton on:click={send} class="mx-8">
                 <Icon class="inline" icon="akar-icons:arrow-right" color="rgba(249, 250, 251, 1)"/>
                 send money
             </GreenButton>
@@ -152,6 +174,7 @@
     </div>
     
 </CardBG>
+
 
 <style>
     /* width */
