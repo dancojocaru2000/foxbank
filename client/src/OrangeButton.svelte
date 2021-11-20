@@ -1,15 +1,18 @@
 <script>
+import BaseButton from "./BaseButton.svelte";
+
+
 
 </script>
 
-<main>
-	<button on:click class="rounded-2xl p-6 w-full text-center text-3xl text-gray-50">
+<div class="orange">
+	<BaseButton on:click>
 		<slot></slot>
-	</button>
-</main>
+	</BaseButton>
+</div>
 
 <style>
-	button{
+	.orange {
 		background: linear-gradient(272.39deg, rgba(247, 175, 67, 0.93) -34.2%, rgba(245, 72, 17, 0.93) 100%);
 		box-shadow: 0px 8px 4px rgba(0, 0, 0, 0.25);
 		border-radius: 20px;

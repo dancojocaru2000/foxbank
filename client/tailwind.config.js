@@ -18,6 +18,16 @@ module.exports = {
         "welcome":['Rochester', 'cursive'],
         "sans":['Roboto', 'sans-serif']
       },
+
+      colors: {
+        'regal-blue': '#243c5a',
+        'lime-c': '#6DE25ACC',
+        'red-c': '#FB6666',
+      },
+
+      minWidth: {
+        'transaction': '420px',
+      },
     },
   },
   variants: {

@@ -5,22 +5,22 @@ import Login from "./Login.svelte";
 import MainPage from "./MainPage.svelte";
 import TopBorder from "./TopBorder.svelte";
 
-	let loggedin = false;
+	let loggedin = true;
 	function toggleLoggedIn() {
 		loggedin = !loggedin;
 	}
 </script>
 
-<main class="flex flex-col items-stretch bg-banner bg-cover bg-center h-screen font-sans">
+<main class="flex flex-col items-stretch bg-banner bg-cover bg-center bg-fixed h-screen font-sans">
 	<TopBorder class="flex-shrink"></TopBorder>
-	<div class="flex-grow">
+	<div class="flex-grow max-h-full overflow-hidden">
 		{#if loggedin}
 			<MainPage on:logOut={toggleLoggedIn}></MainPage>
 		{:else}
 			<Login on:loginSuccess={toggleLoggedIn}></Login>
 		{/if}
 	</div>
-	<BottomBorder class="flex-shrink"></BottomBorder>
+	<BottomBorder class="flex-none"></BottomBorder>
 </main>
 
 <svelte:head>

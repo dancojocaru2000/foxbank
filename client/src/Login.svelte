@@ -1,9 +1,10 @@
 <script>
-    import Button from "./Button.svelte";
+    import OrangeButton from "./OrangeButton.svelte";
 
     import CardBG from "./CardBG.svelte";
     import InputField from "./InputField.svelte";
     import {createEventDispatcher} from 'svelte';
+
     
     const dispatch = createEventDispatcher();
 
@@ -30,7 +31,7 @@
             </div>
 
             <div class="m-3 flex-shrink"> 
-                <Button on:click={checkLogin}>Login</Button>
+                <OrangeButton on:click={checkLogin}>Login</OrangeButton>
             </div>
             
             <div class="flex-grow">
@@ -38,8 +39,8 @@
             </div>
 
             <div class="flex">
-                    <a href='https://google.com' class='text-3xl text-gray-400 m-6 flex-auto text-center'>Help!</a>
-                    <a href='https://google.com' class='text-3xl text-gray-400 m-6 flex-auto text-center'>Can't login?</a>
+                    <a href='https://support.google.com/accounts/answer/1066447?hl=ro&co=GENIE.Platform%3DAndroid' target="_blank" class='text-3xl text-gray-400 m-6 flex-auto text-center'>Help!</a>
+                    <a href='https://support.google.com/accounts/answer/185834?hl=en' target="_blank" class='text-3xl text-gray-400 m-6 flex-auto text-center'>Can't login?</a>
             </div>
             
         </CardBG>
