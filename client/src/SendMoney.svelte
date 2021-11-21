@@ -4,77 +4,89 @@
     import CardBG from "./CardBG.svelte";
     import InputField from "./InputField.svelte";
     import {createEventDispatcher} from 'svelte';
-import Icon from "@iconify/svelte";
+    import Icon from "@iconify/svelte";
+    import Overlay from "./Overlay.svelte";
+    import TextareaField from "./TextareaField.svelte";
+    import { fade, fly, slide } from 'svelte/transition';
+	import { flip } from 'svelte/animate';
 
     
     const dispatch = createEventDispatcher();
 
-    let type = "";
-    let currencies = ["RON", "EUR"];
-    let currency = currencies[0];
-    let termsAccepted = false;
+    export let account={type: "", currency:"", balance:0};
+    let receivername="";
+    let receiveriban="";
+    let amount=0.00;
+    let description="";
+
+    let send_details={receivername:"", receiveriban:"", amount:0, description:""};
 
     function create(){
-        if(type == "" || type == null) {
-            alert("Account Name field can not be empty!");
-            console.debug(`account name: ${type}`)
-        }else if(!currencies.includes(currency)){
-            alert("Currency is not supported!");
-        }else if (!termsAccepted){
-            alert("Terms of Service not accepted!");
+        if(receivername == "" || receivername == null) {
+            alert("Receiver's name field can not be empty!");
+        }else if(receiveriban == "" || receiveriban == null){
+            alert("Receiver's iBan field can not be empty!");
+        }else if (amount > parseFloat(account.balance) ){
+            alert("Not enough money in your account!");
+        }else if (amount <= 0.00 ){
+            alert("Insert a valid amount!");
         }else{
             //TODO Create account with provided details on the server
-            dispatch("createPopup",{type:"create_acc_success"});
+            send_details={receivername:receivername, receiveriban:receiveriban, amount:amount, description:description}
+            dispatch("createPopup",{type:"send_money_success", send_details:{send_details}});
         }
     }
 
-    function cancelCreate(){
-        dispatch("createPopup",{type:"create_acc_cancelled"});
+    function cancelSend(){
+        dispatch("createPopup",{type:"send_money_cancelled"});
     }
 
-    function failCreate(){
-        dispatch("createPopup",{type:"create_acc_failed", reason:"Invalid arguments. [type: "+type+", currency: "+currency});
-    }
-
-    function termsOfService() {
-        termsAccepted = !termsAccepted;
-    }
 
 </script>
 
-<div class="h-full self-center">
-    <div class="h-full flex flex-col justify-center items-center md:items-start">
-        <CardBG class="flex flex-col items-stretch">
-            <div class="flex flex-row">
-                <h1 class='font-sans text-4xl text-gray-50 mt-6 mx-6 mb-1'>Open a new account</h1>
-                <button class="ml-auto mr-6" on:click={cancelCreate}> <Icon icon="akar-icons:cross" color="rgba(249, 250, 251, 1)" width="32" height="32" /> </button>  
+
+<div class="h-full flex flex-col justify-center items-center md:items-start" in:fade={{duration:300}} out:fade={{duration:300}}>
+    <CardBG padding={false} class="flex flex-col items-stretch md:min-w-full">
+        <div class="flex-grow m-3 flex flex-col items-stretch">
+            <div class="flex flex-row ">
+                <h1 class='inline mt-6 mx-6 mb-1 font-sans text-4xl text-gray-50'>Send money</h1>
+                <span class="mb-1 ml-4 mr-2 mt-auto text-2xl text-gray-50"> from</span>
+                <span class="mb-1 mt-auto font-sans text-4xl">{account.type}</span>
+                <button class="mb-1 ml-auto" on:click={cancelSend}> <Icon icon="akar-icons:cross" color="rgba(249, 250, 251, 1)" width="32" height="32" /> </button>  
             </div>
             <div class="w-full max-w-md self-start border-solid border-gray-50 border mb-3"></div> 
-     
-            <div class="mx-1 flex-shrink">
-                <h2 class='font-sans text-2xl text-gray-50 mb-2 '>Account name:</h2>
-                <InputField placeholder="New Account" isPassword={false} bind:value={type}></InputField>
-            </div>
-            
-            <div class="mx-1 flex-shrink">
-                <h2 class='font-sans text-2xl text-gray-50 mb-2 '>Currency:</h2>
-                <InputField placeholder="RON" isPassword={false} bind:value={currency}></InputField>
-            </div>
-
-            <div class="mx-1 flex-shrink  max-w-2xl">
-                <h2 class=" font-sans text-2xl text-gray-50 mb-2 ">Terms of Service:</h2>
-                <button class="mb-1" on:click={termsOfService}> <Icon icon={termsAccepted ? "akar-icons:check-box" : "akar-icons:box"} color="rgba(249, 250, 251, 1)" width="18" height="18" /> </button>
-                <h3 class="inline m-0 mb-0 text-gray-300"> I have read and accepted the <a class="font-sans text-gray-50" href="https://c.tenor.com/TVRtbC8jKY0AAAAC/positive-fox-you-can-do-it.gif" target="_blank">terms and conditions</a> for creating a new account at FOXBANK. </h3>
-            </div>
-            
-            
-            <div class="m-10"></div>
-
-            <div class="mx-1 flex-shrink"> 
-                <OrangeButton on:click={create}>Confirm</OrangeButton>
-            </div>
-            
-        </CardBG>
-    </div>
     
+            <div class="mx-1 flex-shrink">
+                <h2 class='font-sans text-2xl text-gray-50 mb-2 '>Receiver's full name:</h2>
+                <InputField placeholder="Mr Foxy Fox" isPassword={false} bind:value={receivername}></InputField>
+            </div>
+            
+            <div class="mx-1 flex-shrink">
+                <h2 class='font-sans text-2xl text-gray-50 mb-2 '>IBAN:</h2>
+                <InputField placeholder={account.currency +"-0000-0000-0000-0000"} isPassword={false} bind:value={receiveriban}></InputField>
+            </div>
+    
+            <div class="mx-1 flex-shrink">
+                <h2 class='font-sans text-2xl text-gray-50 mb-2 '>Amount:</h2>
+                <InputField style="color: #264D59" placeholder=0 isPassword={false} bind:value={amount}>
+                    <span class="text-gray-50">{account.currency}</span>
+                </InputField>
+            </div>     
+            
+            <div class="mx-1 flex-shrink">
+                <h2 class='font-sans text-2xl text-gray-50 mb-2 '>Description:</h2>
+                <TextareaField class="flex-grow mb-0" placeholder="Sent from FOXBANK!" rows={5} bind:value={description}></TextareaField>
+            </div>
+        </div>
+        
+        
+        <div class="m-4"></div>
+
+        <div class="flex-shrink flex flex-row mb-4 mt-0" style="background: linear-gradient(89.1deg, rgba(236, 98, 68, 0.95) 0.77%, rgba(236, 98, 68, 0) 99.12%);">
+            <div class="flex-1"></div> 
+            <OrangeButton class="flex-1 m-4" on:click={create}>Confirm</OrangeButton>
+        </div>
+        
+    </CardBG>
 </div>
+

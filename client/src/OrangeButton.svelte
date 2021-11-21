@@ -1,11 +1,12 @@
 <script>
 import BaseButton from "./BaseButton.svelte";
 
-
+let clazz = "";
+export {clazz as class};
 
 </script>
 
-<div class="orange">
+<div class="orange {clazz}">
 	<BaseButton on:click>
 		<slot></slot>
 	</BaseButton>

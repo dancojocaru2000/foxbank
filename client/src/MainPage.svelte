@@ -11,7 +11,7 @@
 
     let username = "Firstname Lastname";
     let code = "";
-    let totalbalance = "2455,22";
+    let totalbalance = "2455.22";
     let maincurrency = "RON";
     let expandedAccount = null;
     let showAllAccounts = true;
@@ -21,34 +21,31 @@
         {time: "15:38 27/11/2021", text: "A notification's text but way longer absdb aybdbaysbdya bybdabs bdabsd absdb aybdbaysbdya bybdabs bdabsd absdb aybdbaysbdya bybdabs bdabsd absdb aybdbaysbdya bybdabs bdabsd absdb aybdbaysbdya bybdabs bdabsd absdb aybdbaysbdya bybdabs bdabsd absdb aybdbaysbdya bybdabs bdabsd absdb aybdbaysbdya bybdabs bdabsd absdb aybdbaysbdya bybdabs bdabsd."},
         {time: "15:38 27/11/2021", text: "A notification's text."},
         {time: "15:38 27/11/2021", text: "A notification's text."},
-        {time: "15:38 27/11/2021", text: "A notification's text."},
-        {time: "15:38 27/11/2021", text: "A notification's text."},
-        {time: "15:38 27/11/2021", text: "A notification's text."},
+       
     ];
 
     let accounts = [
-        {type:"RON Account", currency:"RON", balance:"420,42", iban:"RONFOX62188921", 
+        {type:"RON Account", currency:"RON", balance:"420.42", iban:"RONFOX62188921", 
             transactions: [
-                {title:"Transaction Name#1", status:"PROCESSED", amount:"-45,09", time:"15:38 27/11/2021", type:"send"},
-                {title:"Transaction Name#2", status:"PENDING", amount:"+25,00", time:"15:38 27/11/2021", type:"received"},
-                {title:"Transaction Name#3", status:"CANCELLED", amount:"-469,09", time:"15:38 27/11/2021", type:"send"},
-                {title:"Transaction Name#1", status:"PROCESSED", amount:"-45,09", time:"15:38 27/11/2021", type:"send"},
-                {title:"Transaction Name#2", status:"PENDING", amount:"+25,00", time:"15:38 27/11/2021", type:"received"},
-                {title:"Transaction Name#3", status:"CANCELLED", amount:"-469,09", time:"15:38 27/11/2021", type:"send"},
-                {title:"Transaction Name#1", status:"PROCESSED", amount:"-45,09", time:"15:38 27/11/2021", type:"send"},
-                {title:"Transaction Name#2", status:"PENDING", amount:"+25,00", time:"15:38 27/11/2021", type:"received"},
-                {title:"Transaction Name#3", status:"CANCELLED", amount:"-469,09", time:"15:38 27/11/2021", type:"send"},
+                {title:"Transaction Name#1", status:"PROCESSED", amount:"-45.09", time:"15:38 27/11/2021", type:"send"},
+                {title:"Transaction Name#2", status:"PENDING", amount:"+25.00", time:"15:38 27/11/2021", type:"received"},
+                {title:"Transaction Name#3", status:"CANCELLED", amount:"-469.09", time:"15:38 27/11/2021", type:"send"},
+                {title:"Transaction Name#1", status:"PROCESSED", amount:"-45.09", time:"15:38 27/11/2021", type:"send"},
+                {title:"Transaction Name#2", status:"PENDING", amount:"+25.00", time:"15:38 27/11/2021", type:"received"},
+                {title:"Transaction Name#3", status:"CANCELLED", amount:"-469.09", time:"15:38 27/11/2021", type:"send"},
+                {title:"Transaction Name#1", status:"PROCESSED", amount:"-45.09", time:"15:38 27/11/2021", type:"send"},
+                {title:"Transaction Name#2", status:"PENDING", amount:"+25.00", time:"15:38 27/11/2021", type:"received"},
+                {title:"Transaction Name#3", status:"CANCELLED", amount:"-469.09", time:"15:38 27/11/2021", type:"send"},
             ]
         }, 
         {type:"EUR Account", currency:"EUR", balance:"620,42", iban:"EURFOX62188921", 
             transactions: [
-                {title:"Transaction Name#2", status:"PENDING", amount:"+25,00", time:"15:38 27/11/2021", type:"received"},
-                {title:"Transaction Name#1", status:"PROCESSED", amount:"-45,09", time:"15:38 27/11/2021", type:"send"},
-                {title:"Transaction Name#3", status:"CANCELLED", amount:"-469,09", time:"15:38 27/11/2021", type:"send"},
+                {title:"Transaction Name#2", status:"PENDING", amount:"+25.00", time:"15:38 27/11/2021", type:"received"},
+                {title:"Transaction Name#1", status:"PROCESSED", amount:"-45.09", time:"15:38 27/11/2021", type:"send"},
+                {title:"Transaction Name#3", status:"CANCELLED", amount:"-469.09", time:"15:38 27/11/2021", type:"send"},
             ]
         },
     ];
-    
 
     function dispatchLogout(){
         //todo: CHeck here 
@@ -99,7 +96,7 @@
             {#if showAllAccounts}
                 {#each accounts as account,i}
                     <div in:slide={{delay:500*i, duration:250*(i==0 ? 1 : i) }}>
-                        <AccountCard type={account.type} currency={account.currency} balance={account.balance} iban={account.iban} transactions={account.transactions} isExpanded={false} on:expanded={() => expanded(i)}></AccountCard>
+                        <AccountCard type={account.type} currency={account.currency} balance={account.balance} iban={account.iban} transactions={account.transactions} isExpanded={false} on:expanded={() => expanded(i)} on:createPopup></AccountCard>
                     </div> 
                 {/each}
             {/if}

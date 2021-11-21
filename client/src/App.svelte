@@ -5,6 +5,8 @@ import CreateAccount from "./CreateAccount.svelte";
 
 import Login from "./Login.svelte";
 import MainPage from "./MainPage.svelte";
+import Overlay from "./Overlay.svelte";
+import SendMoney from "./SendMoney.svelte";
 import TopBorder from "./TopBorder.svelte";
 
 	let loggedin = true;
@@ -26,6 +28,15 @@ import TopBorder from "./TopBorder.svelte";
 			break;
 
 			case "create_acc_success":
+				var today = new Date();
+				var date = today.getDate()+'/'+(today.getMonth()+1)+'/'+today.getFullYear();
+				var time = today.getHours() + ":" + today.getMinutes();
+
+				notifications.push(
+					{
+						text: "The new account '" + event.detail.type+ "' was created successfully!",
+						time: time + " " + date,
+					});
 				isCreatingAccount = false;
 			break;
 
@@ -39,7 +50,7 @@ import TopBorder from "./TopBorder.svelte";
 			break;
 
 			case "send_money":
-				sendingAccount = event.detail.iban;
+				sendingAccount = event.detail.account;
 				isSendingMoney = true;
 			break;
 
@@ -47,9 +58,8 @@ import TopBorder from "./TopBorder.svelte";
 				isSendingMoney = false;
 			break;
 
-			case "send_money_failed":
+			case "send_money_success":
 				isSendingMoney = false;
-				alert(`Sending money failed! Reason: ${event.detail.reason}`);
 			break;
 
 			case "check_notifications":
@@ -68,22 +78,41 @@ import TopBorder from "./TopBorder.svelte";
 </script>
 
 <main class="flex flex-col items-stretch bg-banner bg-cover bg-center bg-fixed h-screen font-sans">
-	{#if isCreatingAccount}
-		<CreateAccount on:createPopup={onCreatePopup}> </CreateAccount>
-	{:else if  isCheckingNotifications}
-		 <CheckNotifications on:createPopup={onCreatePopup} notifications={notifications}></CheckNotifications>
-	{:else if  isSendingMoney}
-		 <!-- else if content here -->
-	{/if}
+	
 	<TopBorder class="flex-shrink"></TopBorder>
 	<div class="flex-grow max-h-full overflow-hidden">
 		{#if loggedin}
-			<MainPage on:logOut={toggleLoggedIn} on:createPopup={onCreatePopup}></MainPage>
+			
+			{#if isCreatingAccount}
+				<Overlay>
+					<div class="flex items-center justify-center h-full">
+						<CreateAccount class="" on:createPopup={onCreatePopup}> </CreateAccount>
+					</div>
+				</Overlay>
+			{:else if  isCheckingNotifications}
+				<Overlay>
+					<div class="flex items-center justify-center h-full">
+						<CheckNotifications on:createPopup={onCreatePopup} notifications={notifications}></CheckNotifications>
+					</div>
+				</Overlay>
+			{:else if  isSendingMoney}
+				<Overlay>
+					<div class="flex items-center justify-center h-full w-full">
+						<SendMoney on:createPopup={onCreatePopup} account={sendingAccount}></SendMoney>
+					</div>
+				</Overlay>
+			{/if}
+
+			<MainPage on:createPopup={onCreatePopup} on:logOut={toggleLoggedIn}></MainPage>
+
 		{:else}
 			<Login on:loginSuccess={toggleLoggedIn}></Login>
 		{/if}
+			
+		
 	</div>
 	<BottomBorder class="flex-none"></BottomBorder>
+	
 </main>
 
 <svelte:head>

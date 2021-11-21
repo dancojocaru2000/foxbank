@@ -41,7 +41,12 @@
         //todo: CHeck here 
         dispatch("createPopup",{
             type: 'send_money',
-            iban,
+            account: {
+                type,
+                currency,
+                balance,
+                iban,
+            }
         });
     }
 </script>

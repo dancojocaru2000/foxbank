@@ -5,7 +5,7 @@
     import Icon from "@iconify/svelte";
     import { fade, fly, slide } from 'svelte/transition';
 	import { flip } from 'svelte/animate';
-import DetailField from "./DetailField.svelte";
+    import DetailField from "./DetailField.svelte";
 
     
     const dispatch = createEventDispatcher();
@@ -19,15 +19,15 @@ import DetailField from "./DetailField.svelte";
 </script>
 
 <div class="h-full self-center">
-    <div class="h-full flex flex-col justify-center items-center md:items-start">
-        <CardBG class="flex flex-col items-stretch">
+    <div class="h-full flex flex-col justify-center items-center md:items-start overflow-clip">
+        <CardBG class="flex flex-col items-stretch min-h-0">
             <div class="flex flex-row">
                 <h1 class='font-sans text-4xl text-gray-50 mt-6 mx-6 mb-1'>Inbox</h1>
                 <button class="ml-auto mr-6" on:click={cancelCheckNotifications}> <Icon icon="akar-icons:cross" color="rgba(249, 250, 251, 1)" width="32" height="32" /> </button>  
             </div>
             <div class="w-full max-w-md self-start border-solid border mb-3"></div> 
 
-            <div class="flex flex-col flex-grow pl-8 pr-10 relative scroller overflow-auto overflow-x-hidden max-h-medium">
+            <div class="flex flex-col flex-grow pl-8 pr-10 relative scroller overflow-auto overflow-x-hidden max-h-full min-h-0">
                 {#each notifications as notification,i (i)}
                     <div in:slide={{delay:100*i}} out:slide={{delay:50*(notifications.length-i)}}>
                 

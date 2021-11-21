@@ -1,12 +1,13 @@
 <script>
 	export let width = "inherit";
 	export let height = "inherit";
+	export let padding = true;
 
 	let clazz;
 	export {clazz as class}
 </script>
 
-<main class="rounded-x p-3 m-14 {clazz}" style="--width: {width}; --height: {height};">
+<main class="rounded-x {padding ? "p-3" : ""} m-14 {clazz}" style="--width: {width}; --height: {height};">
 	<slot></slot>
 </main>
 
