@@ -1,5 +1,6 @@
 <script>
 import BottomBorder from "./BottomBorder.svelte";
+import CheckNotifications from "./CheckNotifications.svelte";
 import CreateAccount from "./CreateAccount.svelte";
 
 import Login from "./Login.svelte";
@@ -68,9 +69,9 @@ import TopBorder from "./TopBorder.svelte";
 
 <main class="flex flex-col items-stretch bg-banner bg-cover bg-center bg-fixed h-screen font-sans">
 	{#if isCreatingAccount}
-		<CreateAccount> </CreateAccount>
+		<CreateAccount on:createPopup={onCreatePopup}> </CreateAccount>
 	{:else if  isCheckingNotifications}
-		 <!-- else if content here -->
+		 <CheckNotifications on:createPopup={onCreatePopup} notifications={notifications}></CheckNotifications>
 	{:else if  isSendingMoney}
 		 <!-- else if content here -->
 	{/if}

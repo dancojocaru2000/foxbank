@@ -20,6 +20,10 @@
         {time: "15:38 27/11/2021", text: "A notification's text but longer aaaaaaaaaaaa asddagagfabsdhubaiufbau bdauhsbabsdbayub badysabdyba ybbdbasbd bbdabsdb aybdbaysbdya bybdabs bdabsdbadbua."},
         {time: "15:38 27/11/2021", text: "A notification's text but way longer absdb aybdbaysbdya bybdabs bdabsd absdb aybdbaysbdya bybdabs bdabsd absdb aybdbaysbdya bybdabs bdabsd absdb aybdbaysbdya bybdabs bdabsd absdb aybdbaysbdya bybdabs bdabsd absdb aybdbaysbdya bybdabs bdabsd absdb aybdbaysbdya bybdabs bdabsd absdb aybdbaysbdya bybdabs bdabsd absdb aybdbaysbdya bybdabs bdabsd."},
         {time: "15:38 27/11/2021", text: "A notification's text."},
+        {time: "15:38 27/11/2021", text: "A notification's text."},
+        {time: "15:38 27/11/2021", text: "A notification's text."},
+        {time: "15:38 27/11/2021", text: "A notification's text."},
+        {time: "15:38 27/11/2021", text: "A notification's text."},
     ];
 
     let accounts = [

@@ -23,11 +23,11 @@
         <CardBG class="flex flex-col items-stretch">
             <h1 class='font-welcome text-7xl text-gray-50 m-6 border-b-2'>Welcome,</h1>
             <div class="m-3 flex-shrink">
-                <InputField placeholder="Username" isPassword={false} value={username}></InputField>
+                <InputField placeholder="Username" isPassword={false} bind:value={username}></InputField>
             </div>
             
             <div class="m-3 flex-shrink">
-                <InputField placeholder="Code" isPassword={true} value={code}></InputField>
+                <InputField placeholder="Code" isPassword={true} bind:value={code}></InputField>
             </div>
 
             <div class="m-3 flex-shrink"> 
