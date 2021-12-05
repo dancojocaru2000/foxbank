@@ -4,7 +4,9 @@ from flask import current_app, g
 
 DB_FILE = './data/db.sqlite'
 
-def get():
+get_return = sqlite3.Connection
+
+def get() -> get_return:
     if 'db' not in g:
         g.db = sqlite3.connect(
             DB_FILE,

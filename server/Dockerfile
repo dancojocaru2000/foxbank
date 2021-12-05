@@ -10,4 +10,4 @@ RUN pipenv install
 COPY . .
 
 EXPOSE 5000
-CMD [ "pipenv", "run", "gunicorn", "-b", "0.0.0.0:5000", "server:app" ]
+CMD [ "pipenv", "run", "gunicorn", "-b", "0.0.0.0:5000", "--access-logfile", "-", "server:app" ]
