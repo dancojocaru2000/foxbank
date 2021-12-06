@@ -4,6 +4,7 @@ from flask import Blueprint, request
 from pyotp import TOTP
 
 import db_utils
+from decorators import no_content
 import models
 import ram_db
 import returns
@@ -41,8 +42,14 @@ def ensure_logged_in(fn):
         user_id = ram_db.get_user(token)
         if user_id is None:
             return returns.INVALID_AUTHORIZATION
-        return fn(user_id=user_id, *args, **kargs)
+        return fn(user_id=user_id, token=token, *args, **kargs)
     return wrapper
+
+@login.post('/logout')
+@ensure_logged_in
+@no_content
+def logout(token: str):
+    ram_db.logout_user(token)
 
 @login.get('/whoami')
 @ensure_logged_in

@@ -14,9 +14,15 @@ def login_user(user_id: int) -> str:
         token = str(uuid4())
     if len(USED_TOKENS) > 10_000_000:
         USED_TOKENS.clear()
+        for token in LOGGED_IN_USERS:
+            USED_TOKENS.add(token)
     USED_TOKENS.add(token)
     LOGGED_IN_USERS[token] = user_id, datetime.now()
     return token
+
+def logout_user(token: str):
+    if token in LOGGED_IN_USERS:
+        del LOGGED_IN_USERS[token]
 
 def get_user(token: str) -> int | None:
     if token not in LOGGED_IN_USERS:
