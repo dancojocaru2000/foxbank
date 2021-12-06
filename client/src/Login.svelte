@@ -4,6 +4,7 @@
     import CardBG from "./CardBG.svelte";
     import InputField from "./InputField.svelte";
     import {createEventDispatcher} from 'svelte';
+    import {login} from './api.js';
 
     
     const dispatch = createEventDispatcher();
@@ -11,9 +12,15 @@
     let username = "";
     let code = "";
 
-    function checkLogin(){
-        //todo: CHeck here 
-        dispatch("loginSuccess",null);
+    async function checkLogin(){
+        const result = await login(username, code);
+        if(result.status == "success") {
+            sessionStorage.setItem("token", result.token);
+            dispatch("loginSuccess",null);
+        }else{
+            alert(result.code);
+        }
+        
     }
 
 </script>

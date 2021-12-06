@@ -1,15 +1,18 @@
 <script>
-import BottomBorder from "./BottomBorder.svelte";
-import CheckNotifications from "./CheckNotifications.svelte";
-import CreateAccount from "./CreateAccount.svelte";
+	import { onMount } from "svelte";
+import { whoami } from "./api";
 
-import Login from "./Login.svelte";
-import MainPage from "./MainPage.svelte";
-import Overlay from "./Overlay.svelte";
-import SendMoney from "./SendMoney.svelte";
-import TopBorder from "./TopBorder.svelte";
+	import BottomBorder from "./BottomBorder.svelte";
+	import CheckNotifications from "./CheckNotifications.svelte";
+	import CreateAccount from "./CreateAccount.svelte";
 
-	let loggedin = true;
+	import Login from "./Login.svelte";
+	import MainPage from "./MainPage.svelte";
+	import Overlay from "./Overlay.svelte";
+	import SendMoney from "./SendMoney.svelte";
+	import TopBorder from "./TopBorder.svelte";
+
+	let loggedin = false;
 	function toggleLoggedIn() {
 		loggedin = !loggedin;
 	}
@@ -75,6 +78,20 @@ import TopBorder from "./TopBorder.svelte";
 				alert(`Unhandled createPopup event: ${eventType}`);
 		}
 	}
+
+	onMount(async function() {
+		const token = sessionStorage.getItem("token");
+		if(token == null){
+			loggedin = false;
+		}else {
+			const result = await whoami(token);
+			if (result.status == "success") {
+				loggedin = true;
+			}else {
+				loggedin = false;
+			}
+		}
+	})
 </script>
 
 <main class="flex flex-col items-stretch bg-banner bg-cover bg-center bg-fixed h-screen font-sans">

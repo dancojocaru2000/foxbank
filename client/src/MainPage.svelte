@@ -1,15 +1,19 @@
 <script>
     import Icon from '@iconify/svelte';
     import CardBG from "./CardBG.svelte";
-    import {createEventDispatcher} from 'svelte';
+    import {createEventDispatcher, onMount} from 'svelte';
     import AccountCard from './AccountCard.svelte';
     import GreenButton from './GreenButton.svelte';
     import { fade, fly, slide } from 'svelte/transition';
 	import { flip } from 'svelte/animate';
+    import { logout, whoami } from './api';
+
     
     const dispatch = createEventDispatcher();
 
-    let username = "Firstname Lastname";
+    let fullname = "";
+    let username = "";
+    let email = "";
     let code = "";
     let totalbalance = "2455.22";
     let maincurrency = "RON";
@@ -50,6 +54,8 @@
     function dispatchLogout(){
         //todo: CHeck here 
         if (confirm("Log out?")) {
+            logout(sessionStorage.getItem("token"));
+            sessionStorage.removeItem("token");
             dispatch("logOut",null);
         } 
     }
@@ -86,6 +92,16 @@
         });
     }
 
+    onMount( async function() {
+        const token = sessionStorage.getItem("token");
+        const result = await whoami(token);
+        if(result.status == "success") {
+            fullname = result.user.fullname;
+            email = result.user.email;
+            username = result.user.username;
+        }
+    })
+
 </script>
 
 <main class="h-full flex flex-col items-stretch md:flex-row">
@@ -115,9 +131,9 @@
     <div class="flex-shrink md:flex-shrink-0 md:flex-grow"></div>
 
     <div in:fade={{duration:250}}>
-        <CardBG class="flex-shrink flex flex-col items-stretch md:self-start p-6">
+        <CardBG class="flex-shrink flex flex-col min-w-transaction items-stretch md:self-start p-6">
             <div class="flex flex-row"> 
-                <h1 class='font-sans text-5xl text-gray-50 m-6 border-b-2'>{username}</h1>
+                <h1 class='font-sans flex-grow text-5xl text-gray-50 m-6 border-b-2'>{fullname}</h1>
                 <button on:click={checkNotifications} style=" filter: drop-shadow(0px 4px 4px rgba(0, 0, 0, 0.25));"> <Icon icon="akar-icons:envelope" color="#FB6666" width="36" height="36" /></button>
             </div>
             
