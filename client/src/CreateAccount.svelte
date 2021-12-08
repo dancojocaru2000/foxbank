@@ -14,7 +14,12 @@
     const dispatch = createEventDispatcher();
 
     let type = "";
-    let currencies = ["RON", "EUR"];
+    let currencies = [
+        "RON",
+        "USD",
+        "EUR",
+        "GPD",
+    ];
     let currency = currencies[0];
     let termsAccepted = false;
 
@@ -71,7 +76,12 @@
                     
                     <div class="mx-1 flex-shrink">
                         <h2 class='font-sans text-2xl text-gray-50 mb-2 '>Currency:</h2>
-                        <InputField placeholder="RON" isPassword={false} bind:value={currency}></InputField>
+                        <!-- <InputField placeholder="RON" isPassword={false} bind:value={currency}></InputField> -->
+                        <select bind:value={currency}>
+                            {#each currencies as option}
+                                <option class="custom-option" value={option}>{option}</option>
+                            {/each}	
+                        </select>
                     </div>
 
                     <div class="mx-1 flex-shrink  max-w-2xl">
@@ -93,3 +103,28 @@
         </div>
         
     </div>
+
+
+    <style>
+        select{
+            min-width: 120px;
+            min-height: 32px;
+            color: rgba(233, 231, 231, 0.842);
+
+            background: linear-gradient(92.55deg, rgba(76, 172, 135, 0.95) -28.27%, rgba(249, 224, 127, 0.096) 115.79%);
+            filter: drop-shadow(0px 8px 4px rgba(0, 0, 0, 0.25));
+            border-radius: 3px;
+        }
+
+        select option{
+            min-width: 120px;
+            min-height: 32px;
+            color: rgba(233, 231, 231, 0.842);
+
+            background: linear-gradient(92.55deg, rgba(76, 172, 135, 0.95) -28.27%, rgba(249, 224, 127, 0.096) 115.79%);
+            filter: drop-shadow(0px 8px 4px rgba(0, 0, 0, 0.25));
+            border-radius: 3px;
+        }
+
+    
+    </style>
