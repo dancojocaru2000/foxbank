@@ -6,7 +6,7 @@
     import GreenButton from './GreenButton.svelte';
     import { fade, fly, slide } from 'svelte/transition';
 	import { flip } from 'svelte/animate';
-    import { logout, whoami } from './api';
+    import { logout, whoami, getaccountlist } from './api';
 
     
     const dispatch = createEventDispatcher();
@@ -99,6 +99,12 @@
             fullname = result.user.fullname;
             email = result.user.email;
             username = result.user.username;
+            
+            //get the list of accounts
+            const accresult = await getaccountlist(username, token);
+            if(accresult == "success"){
+                accounts = accresult.user.accounts;
+            }
         }
     })
 

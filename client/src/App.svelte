@@ -1,6 +1,6 @@
 <script>
 	import { onMount } from "svelte";
-import { whoami } from "./api";
+	import { whoami, createnotification } from "./api";
 
 	import BottomBorder from "./BottomBorder.svelte";
 	import CheckNotifications from "./CheckNotifications.svelte";
@@ -34,12 +34,19 @@ import { whoami } from "./api";
 				var today = new Date();
 				var date = today.getDate()+'/'+(today.getMonth()+1)+'/'+today.getFullYear();
 				var time = today.getHours() + ":" + today.getMinutes();
+				var body = "The "+ eventType.currency + " account with the name " + eventType.type + " was created succesfully!";
 
-				notifications.push(
-					{
-						text: "The new account '" + event.detail.type+ "' was created successfully!",
-						time: time + " " + date,
-					});
+				//add notification about created account
+				createnotification(async function() {
+					const token = sessionStorage.getItem("token");
+					const result = await createnotification(token, body, date+time);
+					if(result.status == "success") {
+						console.log("Succesfully created notification.");
+					}else{
+                        console.log("Failed to create notification.");
+                    }
+				})
+
 				isCreatingAccount = false;
 			break;
 
@@ -48,7 +55,7 @@ import { whoami } from "./api";
 			break;
 
 			case "create_acc_failed":
-				isCreatingAccount = false;
+				// isCreatingAccount = false;
 				alert(`Account creation failed! Reason: ${event.detail.reason}`);
 			break;
 

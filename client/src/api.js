@@ -55,3 +55,128 @@ export async function logout(token) {
         }
     }
 }
+
+
+export async function getaccountlist(token) {
+    try {
+        const result = await fetch(new URL("/accounts", baseURL), {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": "Bearer " + token,
+            },
+        });
+
+        return (await result.json());
+    } catch (error) {
+        return {
+            status: "error",
+            code: "request/failure"
+        }
+    }
+}
+
+
+export async function getnotificationlist(token) {
+    try {
+        const result = await fetch(new URL("/notifications", baseURL), {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": "Bearer " + token,
+            },
+        });
+
+        return (await result.json());
+    } catch (error) {
+        return {
+            status: "error",
+            code: "request/failure"
+        }
+    }
+}
+
+export async function gettransactions(token, id) {
+    try {
+        const result = await fetch(new URL("/transactions?accountId="+id, baseURL), {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": "Bearer " + token,
+            },
+        });
+
+        return (await result.json());
+    } catch (error) {
+        return {
+            status: "error",
+            code: "request/failure"
+        }
+    }
+}
+
+export async function createaccount(token, name, currency) {
+    try {
+        const result = await fetch(new URL("/account/create", baseURL), {
+            method: "POST",
+            body: JSON.stringify({
+                name, currency,
+            }),
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": "Bearer " + token,
+            },
+        });
+
+        return (await result.json());
+    } catch (error) {
+        return {
+            status: "error",
+            code: "request/failure"
+        }
+    }
+}
+
+export async function createnotification(token, body, datetime) {
+    try {
+        const result = await fetch(new URL("/notification/create", baseURL), {
+            method: "POST",
+            body: JSON.stringify({
+                body, datetime,
+            }),
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": "Bearer " + token,
+            },
+        });
+
+        return (await result.json());
+    } catch (error) {
+        return {
+            status: "error",
+            code: "request/failure"
+        }
+    }
+}
+
+export async function createtransaction(token, otherparty, amount, type, ) {
+    try {
+        const result = await fetch(new URL("/transaction/create", baseURL), {
+            method: "POST",
+            body: JSON.stringify({
+                otherparty, amount, type,
+            }),
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": "Bearer " + token,
+            },
+        });
+
+        return (await result.json());
+    } catch (error) {
+        return {
+            status: "error",
+            code: "request/failure"
+        }
+    }
+}

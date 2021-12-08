@@ -8,6 +8,7 @@
     import Overlay from "./Overlay.svelte";
     import { fade, fly, slide } from 'svelte/transition';
 	import { flip } from 'svelte/animate';
+    import { createaccount } from "./api";
 
     
     const dispatch = createEventDispatcher();
@@ -26,8 +27,15 @@
         }else if (!termsAccepted){
             alert("Terms of Service not accepted!");
         }else{
-            //TODO Create account with provided details on the server
-            dispatch("createPopup",{type:"create_acc_success", account:{type:type, currency:currency, transactions:[]}});
+            createaccount(async function() {
+					const token = sessionStorage.getItem("token");
+					const result = await createaccount(token, type, currency);
+					if(result.status == "success") {
+						dispatch("createPopup",{type:"create_acc_success", account:{type:type, currency:currency, transactions:[]}});
+					}else{
+                        dispatch("createPopup",{type:"create_acc_failed", reason:"Failed to create account. Error:"+result.status});
+                    }
+				})
         }
     }
 
