@@ -4,7 +4,7 @@ from flask import Blueprint, request
 from pyotp import TOTP
 
 import db_utils
-from decorators import no_content
+from decorators import no_content, ensure_logged_in
 import models
 import ram_db
 import returns
@@ -29,33 +29,6 @@ def make_login():
 
     token = ram_db.login_user(user.id)
     return returns.success(token=token)
-
-def ensure_logged_in(token=False, user_id=False):
-    def decorator(fn):
-        pass_token = token
-        pass_user_id = user_id
-        @wraps(fn)
-        def wrapper(*args, **kargs):
-            token = request.headers.get('Authorization', None)
-            if token is None:
-                return returns.NO_AUTHORIZATION
-            if not token.startswith('Bearer '):
-                return returns.INVALID_AUTHORIZATION
-            token = token[7:]
-            user_id = ram_db.get_user(token)
-            if user_id is None:
-                return returns.INVALID_AUTHORIZATION
-
-            if pass_user_id and pass_token:
-                return fn(user_id=user_id, token=token, *args, **kargs)
-            elif pass_user_id:
-                return fn(user_id=user_id, *args, **kargs)
-            elif pass_token:
-                return fn(token=token, *args, **kargs)
-            else:
-                return fn(*args, **kargs)
-        return wrapper
-    return decorator
 
 @login.post('/logout')
 @ensure_logged_in(token=True)
