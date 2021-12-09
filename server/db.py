@@ -2,7 +2,8 @@ import sqlite3
 
 from flask import current_app, g
 
-DB_FILE = './data/db.sqlite'
+import os
+DB_FILE = os.environ('DB_FILE', './data/db.sqlite')
 
 get_return = sqlite3.Connection
 
