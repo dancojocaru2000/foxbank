@@ -35,10 +35,15 @@ def get_valid_account_types():
     return returns.success(account_types=ACCOUNT_TYPES)
 
 
+class AccountResponseSchema(returns.SuccessSchema):
+    account = fields.Nested(Account.Schema)
+
+
 @bp.get('/<int:account_id>')
 @ensure_logged_in
 @bp.response(401, returns.ErrorSchema, description='Login failure')
 @bp.doc(security=[{'Token': []}])
+@bp.response(200, AccountResponseSchema)
 def get_account_id(account_id: int):
     """Get account by id"""
     account = db_utils.get_account(account_id=account_id)
@@ -54,6 +59,7 @@ def get_account_id(account_id: int):
 @ensure_logged_in
 @bp.response(401, returns.ErrorSchema, description='Login failure')
 @bp.doc(security=[{'Token': []}])
+@bp.response(200, AccountResponseSchema)
 def get_account_iban(iban: str):
     """Get account by IBAN"""
     account = db_utils.get_account(iban=iban)
