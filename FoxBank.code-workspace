@@ -10,5 +10,15 @@
 			"path": "."
 		}
 	],
-	"settings": {}
+	"settings": {
+		"sqltools.connections": [
+			{
+				"previewLimit": 50,
+				"driver": "SQLite",
+				"database": "${workspaceFolder:server}/data/db.sqlite",
+				"name": "Server DB"
+			}
+		],
+		"sqltools.useNodeRuntime": true
+	}
 }

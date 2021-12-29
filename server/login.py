@@ -4,7 +4,7 @@ from flask import Blueprint, request
 from pyotp import TOTP
 
 import db_utils
-from decorators import no_content, ensure_logged_in
+from decorators import no_content, ensure_logged_in, user_id, token
 import models
 import ram_db
 import returns
@@ -31,16 +31,17 @@ def make_login():
     return returns.success(token=token)
 
 @login.post('/logout')
-@ensure_logged_in(token=True)
+@ensure_logged_in
 @no_content
-def logout(token: str):
+def logout():
     ram_db.logout_user(token)
 
 @login.get('/whoami')
-@ensure_logged_in(user_id=True)
-def whoami(user_id: int):
+@ensure_logged_in
+def whoami():
     user: models.User | None = db_utils.get_user(user_id=user_id)
     if user is not None:
         user = user.to_json()
 
-    return returns.success(user=user)
+    return returns.successs(user=user)
+

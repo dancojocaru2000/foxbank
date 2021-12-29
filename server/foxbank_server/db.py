@@ -3,9 +3,10 @@ import sqlite3
 from flask import current_app, g
 
 import os
-DB_FILE = os.environ('DB_FILE', './data/db.sqlite')
+DB_FILE = os.environ.get('DB_FILE', './data/db.sqlite')
 
 get_return = sqlite3.Connection
+
 
 def get() -> get_return:
     if 'db' not in g:
@@ -17,11 +18,13 @@ def get() -> get_return:
 
     return g.db
 
+
 def close(e=None):
     db = g.pop('db', None)
 
     if db:
         db.close()
+
 
 def init():
     db = get()
@@ -29,6 +32,7 @@ def init():
     with current_app.open_resource('init.sql') as f:
         db.executescript(f.read().decode('utf8'))
         db.commit()
+
 
 def init_app(app):
     app.teardown_appcontext(close)
