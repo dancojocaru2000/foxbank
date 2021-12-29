@@ -26,6 +26,7 @@ class Login(MethodView):
     @bp.response(401, returns.ErrorSchema, description='Login failure')
     @bp.response(200, LoginSuccessSchema)
     def post(self, username: str, code: str):
+        """Login via username and TOTP code"""
         user: User | None = get_user(username=username)
         if user is None:
             return returns.INVALID_DETAILS
@@ -37,6 +38,23 @@ class Login(MethodView):
         token = ram_db.login_user(user.id)
         return returns.success(token=token)
 
+    @ensure_logged_in
+    @bp.doc(security=[{'Token': []}])
+    @bp.response(401, returns.ErrorSchema, description='Login failure')
+    @bp.response(204)
+    def delete(self):
+        """Logout"""
+        ram_db.logout_user(decorators.token)
+
+@bp.post('/logout')
+@ensure_logged_in
+@bp.doc(security=[{'Token': []}])
+@bp.response(401, returns.ErrorSchema, description='Login failure')
+@bp.response(204)
+def logout_route():
+    """Logout"""
+    ram_db.logout_user(decorators.token)
+
 @bp.route('/whoami')
 class WhoAmI(MethodView):
     class WhoAmISchema(returns.SuccessSchema):
@@ -47,6 +65,7 @@ class WhoAmI(MethodView):
     @bp.doc(security=[{'Token': []}])
     @ensure_logged_in
     def get(self):
+        """Get information about currently logged in user"""
         user: User | None = get_user(user_id=decorators.user_id)
         if user is not None:
             user = user.to_json()
