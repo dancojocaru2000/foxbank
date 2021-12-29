@@ -1,4 +1,5 @@
 from http import HTTPStatus
+from flask.views import MethodView
 from flask_smorest import Blueprint, abort
 from marshmallow import Schema, fields
 from ..decorators import ensure_logged_in
@@ -34,6 +35,7 @@ def get_valid_account_types():
 
 @bp.get('/<int:account_id>')
 @ensure_logged_in
+@bp.response(401, returns.ErrorSchema, description='Login failure')
 @bp.doc(security=[{'Token': []}])
 def get_account_id(account_id: int):
     account = db_utils.get_account(account_id=account_id)
@@ -47,6 +49,7 @@ def get_account_id(account_id: int):
 
 @bp.get('/IBAN_<iban>')
 @ensure_logged_in
+@bp.response(401, returns.ErrorSchema, description='Login failure')
 @bp.doc(security=[{'Token': []}])
 def get_account_iban(iban: str):
     account = db_utils.get_account(iban=iban)
@@ -58,25 +61,41 @@ def get_account_iban(iban: str):
     return returns.success(account=account)
 
 
+@bp.route('/')
+class AccountsList(MethodView):
+    class CreateAccountParams(Schema):
+        currency = fields.String()
+        account_type = fields.String(data_key='accountType')
+        custom_name = fields.String(data_key='customName')
 
-class CreateAccountParams(Schema):
-    currency = fields.String()
-    account_type = fields.String(data_key='accountType')
-    custom_name = fields.String(data_key='customName')
+    class CreateAccountResponseSchema(returns.SuccessSchema):
+        account = fields.Nested(Account.Schema)
 
-@bp.post('/')
-@ensure_logged_in
-@bp.arguments(CreateAccountParams, as_kwargs=True)
-@bp.response(200, Account.Schema)
-@bp.response(HTTPStatus.UNPROCESSABLE_ENTITY, description='Invalid currency or account type')
-@bp.doc(security=[{'Token': []}])
-def create_account(currency: str, account_type: str, custom_name: str):
-    if currency not in VALID_CURRENCIES:
-        abort(HTTPStatus.UNPROCESSABLE_ENTITY)
-    if account_type not in ACCOUNT_TYPES:
-        abort(HTTPStatus.UNPROCESSABLE_ENTITY)
+    @ensure_logged_in
+    @bp.response(401, returns.ErrorSchema, description='Login failure')
+    @bp.doc(security=[{'Token': []}])
+    @bp.arguments(CreateAccountParams, as_kwargs=True)
+    @bp.response(200, CreateAccountResponseSchema)
+    @bp.response(HTTPStatus.UNPROCESSABLE_ENTITY, description='Invalid currency or account type')
+    def post(self, currency: str, account_type: str, custom_name: str):
+        """Create account"""
+        if currency not in VALID_CURRENCIES:
+            abort(HTTPStatus.UNPROCESSABLE_ENTITY)
+        if account_type not in ACCOUNT_TYPES:
+            abort(HTTPStatus.UNPROCESSABLE_ENTITY)
 
-    account = Account(-1, '', currency, account_type, custom_name or '')
-    db_utils.insert_account(decorators.user_id, account)
-    return account.to_json()
+        account = Account(-1, '', currency, account_type, custom_name or '')
+        db_utils.insert_account(decorators.user_id, account)
+        return returns.success(account=account.to_json())
+
+    class AccountsResponseSchema(returns.SuccessSchema):
+        accounts = fields.List(fields.Nested(Account.Schema))
+
+    @ensure_logged_in
+    @bp.response(401, returns.ErrorSchema, description='Login failure')
+    @bp.doc(security=[{'Token': []}])
+    @bp.response(200, AccountsResponseSchema)
+    def get(self):
+        """Get all accounts of user"""
+        return returns.success(accounts=db_utils.get_accounts(decorators.user_id))
 
