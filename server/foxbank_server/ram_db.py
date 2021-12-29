@@ -1,5 +1,4 @@
 from datetime import datetime, timedelta
-from types import TracebackType
 from uuid import uuid4
 
 USED_TOKENS = set()
