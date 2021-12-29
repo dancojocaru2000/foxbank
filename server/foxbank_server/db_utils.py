@@ -132,7 +132,7 @@ class Module(ModuleType):
             from random import randint
             while True:
                 iban = 'RO00FOXB0' + account.currency
-                iban += str(randint(0, 10 ** 13)).rjust(12, '0')
+                iban += str(randint(10, 10 ** 12 - 1)).rjust(12, '0')
                 from .utils.iban import gen_check_digits
                 iban = gen_check_digits(iban)
                 if iban not in ibans:

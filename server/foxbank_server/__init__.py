@@ -26,8 +26,7 @@ def create_app():
 
 def init_cors(app):
     from flask_cors import CORS
-    cors = CORS()
-    cors.init_app(app)
+    cors = CORS(app)
 
 def init_db(app):
     from .db import init_app
