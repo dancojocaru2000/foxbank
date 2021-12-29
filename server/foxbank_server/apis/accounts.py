@@ -24,12 +24,14 @@ class MetaAccountTypesSchema(Schema):
 @bp.get('/meta/currencies')
 @bp.response(200, MetaCurrenciesSchema)
 def get_valid_currencies():
+    """Get valid account currencies"""
     return returns.success(currencies=VALID_CURRENCIES)
 
 
 @bp.get('/meta/account_types')
 @bp.response(200, MetaAccountTypesSchema)
 def get_valid_account_types():
+    """Get valid account types"""
     return returns.success(account_types=ACCOUNT_TYPES)
 
 
@@ -38,6 +40,7 @@ def get_valid_account_types():
 @bp.response(401, returns.ErrorSchema, description='Login failure')
 @bp.doc(security=[{'Token': []}])
 def get_account_id(account_id: int):
+    """Get account by id"""
     account = db_utils.get_account(account_id=account_id)
     if account is None:
         return returns.abort(returns.NOT_FOUND)
@@ -52,6 +55,7 @@ def get_account_id(account_id: int):
 @bp.response(401, returns.ErrorSchema, description='Login failure')
 @bp.doc(security=[{'Token': []}])
 def get_account_iban(iban: str):
+    """Get account by IBAN"""
     account = db_utils.get_account(iban=iban)
     if account is None:
         return returns.abort(returns.NOT_FOUND)
