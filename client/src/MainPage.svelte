@@ -1,20 +1,22 @@
 <script>
     import Icon from '@iconify/svelte';
     import CardBG from "./CardBG.svelte";
-    import {createEventDispatcher, onMount} from 'svelte';
+    import {createEventDispatcher, onMount, getContext} from 'svelte';
     import AccountCard from './AccountCard.svelte';
     import GreenButton from './GreenButton.svelte';
     import { fade, fly, slide } from 'svelte/transition';
 	import { flip } from 'svelte/animate';
     import { logout, whoami, getaccountlist } from './api';
 
+    const token = getContext("token");
+    const user = getContext("user");
+    const accountsStore = getContext("accounts");
     
     const dispatch = createEventDispatcher();
 
-    let fullname = "";
-    let username = "";
-    let email = "";
-    let code = "";
+    $: fullname = $user.user.fullname;
+    $: username = $user.user.username;
+    $: email = $user.user.email;
     let totalbalance = "2455.22";
     let maincurrency = "RON";
     let expandedAccount = null;
@@ -28,34 +30,45 @@
        
     ];
 
-    let accounts = [
-        {type:"RON Account", currency:"RON", balance:"420.42", iban:"RONFOX62188921", 
+    $: accounts = $accountsStore ? $accountsStore.accounts.map(account => {
+        return {
+            name: account.customName ? account.customName : `${account.accountType} Account`,
+            currency: account.currency,
+            balance: "123.12",
+            iban: account.iban.replace(/(.{4})/g, "$1 "),
             transactions: [
                 {title:"Transaction Name#1", status:"PROCESSED", amount:"-45.09", time:"15:38 27/11/2021", type:"send"},
                 {title:"Transaction Name#2", status:"PENDING", amount:"+25.00", time:"15:38 27/11/2021", type:"received"},
-                {title:"Transaction Name#3", status:"CANCELLED", amount:"-469.09", time:"15:38 27/11/2021", type:"send"},
-                {title:"Transaction Name#1", status:"PROCESSED", amount:"-45.09", time:"15:38 27/11/2021", type:"send"},
-                {title:"Transaction Name#2", status:"PENDING", amount:"+25.00", time:"15:38 27/11/2021", type:"received"},
-                {title:"Transaction Name#3", status:"CANCELLED", amount:"-469.09", time:"15:38 27/11/2021", type:"send"},
-                {title:"Transaction Name#1", status:"PROCESSED", amount:"-45.09", time:"15:38 27/11/2021", type:"send"},
-                {title:"Transaction Name#2", status:"PENDING", amount:"+25.00", time:"15:38 27/11/2021", type:"received"},
-                {title:"Transaction Name#3", status:"CANCELLED", amount:"-469.09", time:"15:38 27/11/2021", type:"send"},
-            ]
-        }, 
-        {type:"EUR Account", currency:"EUR", balance:"620,42", iban:"EURFOX62188921", 
-            transactions: [
-                {title:"Transaction Name#2", status:"PENDING", amount:"+25.00", time:"15:38 27/11/2021", type:"received"},
-                {title:"Transaction Name#1", status:"PROCESSED", amount:"-45.09", time:"15:38 27/11/2021", type:"send"},
-                {title:"Transaction Name#3", status:"CANCELLED", amount:"-469.09", time:"15:38 27/11/2021", type:"send"},
-            ]
-        },
-    ];
+            ],
+        }
+    }) : [];
+    // let accounts = [
+    //     {type:"RON Account", currency:"RON", balance:"420.42", iban:"RONFOX62188921", 
+    //         transactions: [
+    //             {title:"Transaction Name#1", status:"PROCESSED", amount:"-45.09", time:"15:38 27/11/2021", type:"send"},
+    //             {title:"Transaction Name#2", status:"PENDING", amount:"+25.00", time:"15:38 27/11/2021", type:"received"},
+    //             {title:"Transaction Name#3", status:"CANCELLED", amount:"-469.09", time:"15:38 27/11/2021", type:"send"},
+    //             {title:"Transaction Name#1", status:"PROCESSED", amount:"-45.09", time:"15:38 27/11/2021", type:"send"},
+    //             {title:"Transaction Name#2", status:"PENDING", amount:"+25.00", time:"15:38 27/11/2021", type:"received"},
+    //             {title:"Transaction Name#3", status:"CANCELLED", amount:"-469.09", time:"15:38 27/11/2021", type:"send"},
+    //             {title:"Transaction Name#1", status:"PROCESSED", amount:"-45.09", time:"15:38 27/11/2021", type:"send"},
+    //             {title:"Transaction Name#2", status:"PENDING", amount:"+25.00", time:"15:38 27/11/2021", type:"received"},
+    //             {title:"Transaction Name#3", status:"CANCELLED", amount:"-469.09", time:"15:38 27/11/2021", type:"send"},
+    //         ]
+    //     }, 
+    //     {type:"EUR Account", currency:"EUR", balance:"620,42", iban:"EURFOX62188921", 
+    //         transactions: [
+    //             {title:"Transaction Name#2", status:"PENDING", amount:"+25.00", time:"15:38 27/11/2021", type:"received"},
+    //             {title:"Transaction Name#1", status:"PROCESSED", amount:"-45.09", time:"15:38 27/11/2021", type:"send"},
+    //             {title:"Transaction Name#3", status:"CANCELLED", amount:"-469.09", time:"15:38 27/11/2021", type:"send"},
+    //         ]
+    //     },
+    // ];
 
     function dispatchLogout(){
         //todo: CHeck here 
         if (confirm("Log out?")) {
-            logout(sessionStorage.getItem("token"));
-            sessionStorage.removeItem("token");
+            logout($token);
             dispatch("logOut",null);
         } 
     }
@@ -92,33 +105,17 @@
         });
     }
 
-    onMount( async function() {
-        const token = sessionStorage.getItem("token");
-        const result = await whoami(token);
-        if(result.status == "success") {
-            fullname = result.user.fullname;
-            email = result.user.email;
-            username = result.user.username;
-            
-            //get the list of accounts
-            const accresult = await getaccountlist(username, token);
-            if(accresult == "success"){
-                accounts = accresult.user.accounts;
-            }
-        }
-    })
-
 </script>
 
 <main class="h-full flex flex-col items-stretch md:flex-row">
     <div class="flex flex-col items-stretch max-h-full">
         {#if expandedAccount || expandedAccount === 0}
-            <AccountCard type={accounts[expandedAccount].type} currency={accounts[expandedAccount].currency} balance={accounts[expandedAccount].balance} iban={accounts[expandedAccount].iban} transactions={accounts[expandedAccount].transactions} isExpanded={true} on:expanded={() => expanded(null)}></AccountCard>
+            <AccountCard name={accounts[expandedAccount].name} currency={accounts[expandedAccount].currency} balance={accounts[expandedAccount].balance} iban={accounts[expandedAccount].iban} transactions={accounts[expandedAccount].transactions} isExpanded={true} on:expanded={() => expanded(null)}></AccountCard>
         {:else}
             {#if showAllAccounts}
                 {#each accounts as account,i}
                     <div in:slide={{delay:500*i, duration:250*(i==0 ? 1 : i) }}>
-                        <AccountCard type={account.type} currency={account.currency} balance={account.balance} iban={account.iban} transactions={account.transactions} isExpanded={false} on:expanded={() => expanded(i)} on:createPopup></AccountCard>
+                        <AccountCard name={account.name} currency={account.currency} balance={account.balance} iban={account.iban} transactions={account.transactions} isExpanded={false} on:expanded={() => expanded(i)} on:createPopup></AccountCard>
                     </div> 
                 {/each}
             {/if}

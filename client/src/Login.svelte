@@ -15,8 +15,9 @@
     async function checkLogin(){
         const result = await login(username, code);
         if(result.status == "success") {
-            sessionStorage.setItem("token", result.token);
-            dispatch("loginSuccess",null);
+            dispatch("loginSuccess",{
+                token: result.token,
+            });
         }else{
             alert(result.code);
         }

@@ -59,11 +59,47 @@ export async function logout(token) {
 
 export async function getaccountlist(token) {
     try {
-        const result = await fetch(new URL("/accounts", baseURL), {
+        const result = await fetch(new URL("/accounts/", baseURL), {
             method: "GET",
             headers: {
                 "Content-Type": "application/json",
                 "Authorization": "Bearer " + token,
+            },
+        });
+
+        return (await result.json());
+    } catch (error) {
+        return {
+            status: "error",
+            code: "request/failure"
+        }
+    }
+}
+
+export async function getcurrencies() {
+    try {
+        const result = await fetch(new URL("/accounts/meta/currencies", baseURL), {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+            },
+        });
+
+        return (await result.json());
+    } catch (error) {
+        return {
+            status: "error",
+            code: "request/failure"
+        }
+    }
+}
+
+export async function getaccounttypes() {
+    try {
+        const result = await fetch(new URL("/accounts/meta/account_types", baseURL), {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
             },
         });
 
@@ -115,12 +151,14 @@ export async function gettransactions(token, id) {
     }
 }
 
-export async function createaccount(token, name, currency) {
+export async function createaccount(token, name, currency, type) {
     try {
-        const result = await fetch(new URL("/account/create", baseURL), {
+        const result = await fetch(new URL("/accounts/", baseURL), {
             method: "POST",
             body: JSON.stringify({
-                name, currency,
+                customName: name, 
+                currency: currency, 
+                accountType: type,
             }),
             headers: {
                 "Content-Type": "application/json",
