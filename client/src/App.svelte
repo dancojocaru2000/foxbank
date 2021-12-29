@@ -1,6 +1,7 @@
 <script>
-	import { onMount } from "svelte";
-import { whoami } from "./api";
+	import { onMount, setContext } from "svelte";
+	import { writable, readable } from "svelte/store";
+	import { whoami, createnotification, getaccountlist } from "./api";
 
 	import BottomBorder from "./BottomBorder.svelte";
 	import CheckNotifications from "./CheckNotifications.svelte";
@@ -12,16 +13,59 @@ import { whoami } from "./api";
 	import SendMoney from "./SendMoney.svelte";
 	import TopBorder from "./TopBorder.svelte";
 
-	let loggedin = false;
-	function toggleLoggedIn() {
-		loggedin = !loggedin;
-	}
+	const userToken = writable(sessionStorage.getItem("token"));
+	userToken.subscribe(newToken => {
+		sessionStorage.setItem("token", newToken);
+	})
+
+	setContext("token", userToken);
+	
+	const user = readable(null, set => {
+		const unsubscribe = userToken.subscribe(token => {
+			if(token == null) {
+				set(null);
+			}else{
+				whoami(token) 
+					.then(result =>{
+						if(result.status != "success") {
+							$userToken = null;
+						}else {
+							set(result);
+						}
+					})
+			}
+		})
+
+		return () => {
+			unsubscribe();
+		}
+	})
+
+	setContext("user", user);
+
+	const accounts = readable(null, set => {
+		const unsubscribe = userToken.subscribe(token => {
+			if(token == null) {
+				set(null);
+			}else{
+				getaccountlist(token) 
+					.then(result =>{
+						set(result);
+					})
+			}
+		})
+
+		return () => {
+			unsubscribe();
+		}
+	})
+
+	setContext("accounts", accounts);
 
 	let isCreatingAccount = false;
 	let isCheckingNotifications = false;
 	let isSendingMoney = false;
 	let sendingAccount = "";
-	let notifications = [];
 
 	function onCreatePopup(event) {
 		const eventType = event.detail.type;
@@ -34,12 +78,18 @@ import { whoami } from "./api";
 				var today = new Date();
 				var date = today.getDate()+'/'+(today.getMonth()+1)+'/'+today.getFullYear();
 				var time = today.getHours() + ":" + today.getMinutes();
+				var body = "The "+ eventType.currency + " account with the name " + eventType.type + " was created succesfully!";
 
-				notifications.push(
-					{
-						text: "The new account '" + event.detail.type+ "' was created successfully!",
-						time: time + " " + date,
-					});
+				//add notification about created account
+				createnotification(async function() {
+					const result = await createnotification($userToken, body, date+time);
+					if(result.status == "success") {
+						console.log("Succesfully created notification.");
+					}else{
+                        console.log("Failed to create notification.");
+                    }
+				})
+
 				isCreatingAccount = false;
 			break;
 
@@ -48,7 +98,7 @@ import { whoami } from "./api";
 			break;
 
 			case "create_acc_failed":
-				isCreatingAccount = false;
+				// isCreatingAccount = false;
 				alert(`Account creation failed! Reason: ${event.detail.reason}`);
 			break;
 
@@ -79,26 +129,13 @@ import { whoami } from "./api";
 		}
 	}
 
-	onMount(async function() {
-		const token = sessionStorage.getItem("token");
-		if(token == null){
-			loggedin = false;
-		}else {
-			const result = await whoami(token);
-			if (result.status == "success") {
-				loggedin = true;
-			}else {
-				loggedin = false;
-			}
-		}
-	})
 </script>
 
 <main class="flex flex-col items-stretch bg-banner bg-cover bg-center bg-fixed h-screen font-sans">
 	
 	<TopBorder class="flex-shrink"></TopBorder>
 	<div class="flex-grow max-h-full overflow-hidden">
-		{#if loggedin}
+		{#if $user}
 			
 			{#if isCreatingAccount}
 				<Overlay>
@@ -120,10 +157,10 @@ import { whoami } from "./api";
 				</Overlay>
 			{/if}
 
-			<MainPage on:createPopup={onCreatePopup} on:logOut={toggleLoggedIn}></MainPage>
+			<MainPage on:createPopup={onCreatePopup} on:logOut={()=>$userToken=null}></MainPage>
 
 		{:else}
-			<Login on:loginSuccess={toggleLoggedIn}></Login>
+			<Login on:loginSuccess={(e)=> $userToken = e.detail.token}></Login>
 		{/if}
 			
 		

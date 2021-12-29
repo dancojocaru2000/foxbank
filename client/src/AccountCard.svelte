@@ -13,7 +13,7 @@
     const dispatch = createEventDispatcher();
 
 
-	export let type="RON Account";
+	export let name="RON Account";
 	export let currency="RON";
     export let balance="5425";
     export let iban="RONFOX62188921";
@@ -42,7 +42,7 @@
         dispatch("createPopup",{
             type: 'send_money',
             account: {
-                type,
+                type: name,
                 currency,
                 balance,
                 iban,
@@ -55,7 +55,7 @@
 <CardBG class="flex-shrink flex flex-col items-stretch md:self-start mt-16 mb-6 px-6 pt-6 pb-0 max-h-full overflow-clip min-h-0">
     <div class="flex flex-col flex-shrink">
         <div class='font-sans  mt-2 mx-2 border-b-1'>
-            <h3 class="text-gray-50 inline mr-4">{type}</h3>
+            <h3 class="text-gray-50 inline mr-4">{name}</h3>
             <span class="text-gray-100">IBAN: {iban}</span>
             <button on:click={copyIban} class="inline {copied ? "cursor-default" : ""}"> <Icon icon={copied ? "akar-icons:check" : "akar-icons:copy"} color="rgba(249, 250, 251, 1)"/></button>
         </div>

@@ -3,31 +3,41 @@
 
     import CardBG from "./CardBG.svelte";
     import InputField from "./InputField.svelte";
-    import {createEventDispatcher} from 'svelte';
+    import {createEventDispatcher, onMount} from 'svelte';
     import Icon from "@iconify/svelte";
     import Overlay from "./Overlay.svelte";
     import { fade, fly, slide } from 'svelte/transition';
 	import { flip } from 'svelte/animate';
+    import { createaccount, getcurrencies, getaccounttypes } from "./api";
+    import { getContext } from "svelte";
 
+    const token = getContext("token");
     
     const dispatch = createEventDispatcher();
 
-    let type = "";
-    let currencies = ["RON", "EUR"];
-    let currency = currencies[0];
+    let type = null;
+    let name = "";
+    let currency = null;
     let termsAccepted = false;
+    $: placeholder = type==null ? "Checking Account" : `${type} Account`;
 
-    function create(){
-        if(type == "" || type == null) {
+    async function create(){
+        if(name == "" || name == null) {
             alert("Account Name field can not be empty!");
             console.debug(`account name: ${type}`)
-        }else if(!currencies.includes(currency)){
-            alert("Currency is not supported!");
+        }else if(type == null){
+            alert("Type is not selected!");
+        }else if(currency == null){
+            alert("Currency is not selected!");
         }else if (!termsAccepted){
             alert("Terms of Service not accepted!");
         }else{
-            //TODO Create account with provided details on the server
-            dispatch("createPopup",{type:"create_acc_success", account:{type:type, currency:currency, transactions:[]}});
+            const result = await createaccount($token, name, currency, type);
+            if(result.status == "success") {
+                dispatch("createPopup",{type:"create_acc_success", account:{type:type, currency:currency, transactions:[]}});
+            }else{
+                dispatch("createPopup",{type:"create_acc_failed", reason:"Failed to create account. Error:"+result.status});
+            }
         }
     }
 
@@ -42,6 +52,11 @@
     function termsOfService() {
         termsAccepted = !termsAccepted;
     }
+
+    onMount(() => {
+        getcurrencies().then(result => currency = result.currencies[0]);
+        getaccounttypes().then(result => type = result.accountTypes[0]);
+    })
 
 </script>
 
@@ -58,12 +73,31 @@
             
                     <div class="mx-1 flex-shrink">
                         <h2 class='font-sans text-2xl text-gray-50 mb-2 '>Account name:</h2>
-                        <InputField placeholder="New Account" isPassword={false} bind:value={type}></InputField>
+                        <InputField placeholder={placeholder} isPassword={false} bind:value={name}></InputField>
+                    </div>
+
+                    <div class="mx-1 flex-shrink">
+                        <h2 class='font-sans text-2xl text-gray-50 mb-2 '>Type:</h2>
+                        <select bind:value={type}>
+                            {#await getaccounttypes() then result} 
+                                {#each result.accountTypes as option}
+                                    <option class="custom-option" value={option}>{option}</option>
+                                {/each}	
+                            {/await}
+                           
+                        </select>
                     </div>
                     
                     <div class="mx-1 flex-shrink">
                         <h2 class='font-sans text-2xl text-gray-50 mb-2 '>Currency:</h2>
-                        <InputField placeholder="RON" isPassword={false} bind:value={currency}></InputField>
+                        <select bind:value={currency}>
+                            {#await getcurrencies() then result} 
+                                {#each result.currencies as option}
+                                    <option class="custom-option" value={option}>{option}</option>
+                                {/each}	
+                            {/await}
+                           
+                        </select>
                     </div>
 
                     <div class="mx-1 flex-shrink  max-w-2xl">
@@ -85,3 +119,28 @@
         </div>
         
     </div>
+
+
+    <style>
+        select{
+            min-width: 120px;
+            min-height: 32px;
+            color: rgba(233, 231, 231, 0.842);
+
+            background: linear-gradient(92.55deg, rgba(76, 172, 135, 0.95) -28.27%, rgba(249, 224, 127, 0.096) 115.79%);
+            filter: drop-shadow(0px 8px 4px rgba(0, 0, 0, 0.25));
+            border-radius: 3px;
+        }
+
+        select option{
+            min-width: 120px;
+            min-height: 32px;
+            color: rgba(233, 231, 231, 0.842);
+
+            background: linear-gradient(92.55deg, rgba(76, 172, 135, 0.95) -28.27%, rgba(249, 224, 127, 0.096) 115.79%);
+            filter: drop-shadow(0px 8px 4px rgba(0, 0, 0, 0.25));
+            border-radius: 3px;
+        }
+
+    
+    </style>
