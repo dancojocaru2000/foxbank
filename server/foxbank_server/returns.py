@@ -31,6 +31,13 @@ NOT_FOUND = _make_error(
     'general/not_found',
 )
 
+def invalid_argument(argname: str) -> tuple[Any, int]:
+    return _make_error(
+        _HTTPStatus.UNPROCESSABLE_ENTITY,
+        'general/invalid_argument',
+        message=f'Invalid argument: {argname}',
+    )
+
 # Login
 
 INVALID_DETAILS = _make_error(
@@ -76,3 +83,12 @@ class ErrorSchema(Schema):
 
 class SuccessSchema(Schema):
     status = fields.Constant('success')
+
+# smorest
+
+def abort(result: tuple[Any, int]):
+    try:
+        from flask_smorest import abort as _abort
+        _abort(result[1], response=result)
+    except ImportError:
+        return result

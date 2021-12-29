@@ -40,9 +40,9 @@ def get_valid_account_types():
 def get_account_id(account_id: int):
     account = db_utils.get_account(account_id=account_id)
     if account is None:
-        return returns.NOT_FOUND
+        return returns.abort(returns.NOT_FOUND)
     if decorators.user_id != db_utils.whose_account(account):
-        return returns.UNAUTHORIZED
+        return returns.abort(returns.UNAUTHORIZED)
     account = account.to_json()
     return returns.success(account=account)
 
@@ -54,9 +54,9 @@ def get_account_id(account_id: int):
 def get_account_iban(iban: str):
     account = db_utils.get_account(iban=iban)
     if account is None:
-        return returns.NOT_FOUND
+        return returns.abort(returns.NOT_FOUND)
     if decorators.user_id != db_utils.whose_account(account):
-        return returns.UNAUTHORIZED
+        return returns.abort(returns.UNAUTHORIZED)
     account = account.to_json()
     return returns.success(account=account)
 
@@ -80,9 +80,9 @@ class AccountsList(MethodView):
     def post(self, currency: str, account_type: str, custom_name: str):
         """Create account"""
         if currency not in VALID_CURRENCIES:
-            abort(HTTPStatus.UNPROCESSABLE_ENTITY)
+            return returns.abort(returns.invalid_argument('currency'))
         if account_type not in ACCOUNT_TYPES:
-            abort(HTTPStatus.UNPROCESSABLE_ENTITY)
+            return returns.abort(returns.invalid_argument('account_type'))
 
         account = Account(-1, '', currency, account_type, custom_name or '')
         db_utils.insert_account(decorators.user_id, account)

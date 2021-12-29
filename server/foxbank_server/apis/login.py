@@ -29,11 +29,11 @@ class Login(MethodView):
         """Login via username and TOTP code"""
         user: User | None = get_user(username=username)
         if user is None:
-            return returns.INVALID_DETAILS
+            return returns.abort(returns.INVALID_DETAILS)
 
         otp = TOTP(user.otp)
         if not otp.verify(code, valid_window=1):
-            return returns.INVALID_DETAILS
+            return returns.abort(returns.INVALID_DETAILS)
 
         token = ram_db.login_user(user.id)
         return returns.success(token=token)
