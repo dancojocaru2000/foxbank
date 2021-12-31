@@ -13,12 +13,10 @@ bp = Blueprint('accounts', __name__, description='Bank Accounts operations')
 VALID_CURRENCIES = ['RON', 'EUR', 'USD']
 ACCOUNT_TYPES = ['Checking', 'Savings']
 
-class MetaCurrenciesSchema(Schema):
-    status = fields.Constant('success')
+class MetaCurrenciesSchema(returns.SuccessSchema):
     currencies = fields.List(fields.Str())
 
-class MetaAccountTypesSchema(Schema):
-    status = fields.Constant('success')
+class MetaAccountTypesSchema(returns.SuccessSchema):
     account_types = fields.List(fields.Str(), data_key='accountTypes')
 
 @bp.get('/meta/currencies')
@@ -36,7 +34,7 @@ def get_valid_account_types():
 
 
 class AccountResponseSchema(returns.SuccessSchema):
-    account = fields.Nested(Account.Schema)
+    account = fields.Nested(Account.AccountSchema)
 
 
 @bp.get('/<int:account_id>')
@@ -79,7 +77,7 @@ class AccountsList(MethodView):
         custom_name = fields.String(data_key='customName')
 
     class CreateAccountResponseSchema(returns.SuccessSchema):
-        account = fields.Nested(Account.Schema)
+        account = fields.Nested(Account.AccountSchema)
 
     @ensure_logged_in
     @bp.response(401, returns.ErrorSchema, description='Login failure')
@@ -99,7 +97,7 @@ class AccountsList(MethodView):
         return returns.success(account=account.to_json())
 
     class AccountsResponseSchema(returns.SuccessSchema):
-        accounts = fields.List(fields.Nested(Account.Schema))
+        accounts = fields.List(fields.Nested(Account.AccountSchema))
 
     @ensure_logged_in
     @bp.response(401, returns.ErrorSchema, description='Login failure')

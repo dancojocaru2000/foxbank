@@ -74,15 +74,15 @@ def success(http_status: Any = _HTTPStatus.OK, /, **kargs):
 
 # Schemas
 
-from marshmallow import Schema, fields
+from marshmallow import Schema, fields, validate
 
 class ErrorSchema(Schema):
-    status = fields.Constant('error')
+    status = fields.Str(default='error', validate=validate.Equal('error'))
     code = fields.Str()
     message = fields.Str(required=False)
 
 class SuccessSchema(Schema):
-    status = fields.Constant('success')
+    status = fields.Str(default='success', validate=validate.Equal('success'))
 
 # smorest
 

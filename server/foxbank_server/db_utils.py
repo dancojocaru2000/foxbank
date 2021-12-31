@@ -158,4 +158,26 @@ class Module(ModuleType):
 
         self.db.commit()
 
+    @get_db
+    def get_transactions(self, account_id: int) -> list[models.Transaction]:
+        cur = self.db.cursor()
+        cur.execute(
+            'select transaction_id from accounts_transactions where account_id = ?',
+            (account_id,),
+        )
+
+        transactions = []
+        for tid in (row['transaction_id'] for row in cur.fetchall()):
+            cur.execute(
+                'select * from transactions where id = ?',
+                (tid,),
+            )
+
+            db_res = cur.fetchone()
+            if db_res is None:
+                continue
+            transactions.append(models.Transaction.from_query(db_res))
+
+        return transactions
+
 sys.modules[__name__] = Module(__name__)

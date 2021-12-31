@@ -1,5 +1,6 @@
 from dataclasses import dataclass
 from marshmallow import Schema, fields
+from datetime import datetime
 
 @dataclass
 class User:
@@ -51,7 +52,7 @@ class Account:
     account_type: str
     custom_name: str
 
-    class Schema(Schema):
+    class AccountSchema(Schema):
         id = fields.Int(required=False)
         iban = fields.Str()
         currency = fields.Str()
@@ -74,6 +75,50 @@ class Account:
             'currency': self.currency,
             'accountType': self.account_type,
             'customName': self.custom_name,
+        }
+        if include_id:
+            result['id'] = self.id
+        return result
+
+    @classmethod
+    def from_query(cls, query_result):
+        return cls(*query_result)
+
+
+@dataclass
+class Transaction:
+    id: int
+    date_time: datetime
+    other_party: str
+    status: str
+    transaction_type: str
+    extra: str
+
+    class TransactionSchema(Schema):
+        id = fields.Int(required=False)
+        date_time = fields.DateTime(data_key='datetime')
+        other_party = fields.Str(data_key='otherParty')
+        transaction_type = fields.Str(data_key='transactionType')
+        extra = fields.Str()
+
+    @staticmethod
+    def new_transaction(date_time: datetime, other_party: str, status: str, transaction_type: str, extra: str = '') -> 'Account':
+        return Transaction(
+            id=-1,
+            date_time=date_time,
+            other_party=other_party,
+            status=status,
+            transaction_type=transaction_type,
+            extra=extra,
+        )
+
+    def to_json(self, include_id=True):
+        result = {
+            'datetime': self.date_time.isoformat(),
+            'otherParty': self.other_party,
+            'status': self.status,
+            'transactionType': self.transaction_type,
+            'extra': self.extra,
         }
         if include_id:
             result['id'] = self.id
