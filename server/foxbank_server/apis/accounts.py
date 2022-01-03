@@ -7,7 +7,7 @@ import re
 
 from ..decorators import ensure_logged_in
 from ..models import Account
-from ..utils.iban import check_iban
+from ..utils.iban import IBAN_BANKS, check_iban
 from .. import decorators
 from .. import db_utils
 from .. import returns
@@ -29,6 +29,7 @@ class MetaValidateIbanParams(Schema):
 class MetaValidateIbanSchema(returns.SuccessSchema):
     valid = fields.Bool()
     formatted_iban = fields.Str(data_key='formattedIban', optional=True)
+    bank_name = fields.Str(data_key='bankName', optional=True, description='Known bank for IBAN')
 
 @bp.get('/meta/currencies')
 @bp.response(200, MetaCurrenciesSchema)
@@ -51,9 +52,15 @@ def get_validate_iban(iban: str):
     """Validate IBAN"""
     iban = re.sub(r'\s', '', iban)
     valid = len(iban) > 8 and re.match(r'^[A-Z]{2}[0-9]{2}', iban) is not None and check_iban(iban)
+    bank_name = None
+    if iban[0:2] in IBAN_BANKS:
+        if iban[4:8] in IBAN_BANKS[iban[0:2]]:
+            bank_name = IBAN_BANKS[iban[0:2]][iban[4:8]]
+
     return returns.success(
         valid=valid,
         formatted_iban=re.sub(r'(.{4})', r'\1 ', iban) if valid else None,
+        bank_name=bank_name if valid else None,
     )
 
 
