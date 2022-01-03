@@ -22,10 +22,7 @@
     $: placeholder = type==null ? "Checking Account" : `${type} Account`;
 
     async function create(){
-        if(name == "" || name == null) {
-            alert("Account Name field can not be empty!");
-            console.debug(`account name: ${type}`)
-        }else if(type == null){
+        if(type == null){
             alert("Type is not selected!");
         }else if(currency == null){
             alert("Currency is not selected!");
@@ -34,7 +31,7 @@
         }else{
             const result = await createaccount($token, name, currency, type);
             if(result.status == "success") {
-                dispatch("createPopup",{type:"create_acc_success", account:{type:type, currency:currency, transactions:[]}});
+                dispatch("createPopup",{type:"create_acc_success"});
             }else{
                 dispatch("createPopup",{type:"create_acc_failed", reason:"Failed to create account. Error:"+result.status});
             }

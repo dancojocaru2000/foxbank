@@ -5,12 +5,15 @@
     import CardBG from "./CardBG.svelte";    
     import DetailField from './DetailField.svelte';
     import GreenButton from './GreenButton.svelte';
-    import {createEventDispatcher} from 'svelte';
+    import {createEventDispatcher, onMount, getContext} from 'svelte';
     import { fade, fly, slide } from 'svelte/transition';
 	import { flip } from 'svelte/animate';
+    import { gettransactions } from './api';
+    import { amountToString } from './utils';
 
 
     const dispatch = createEventDispatcher();
+    const token = getContext("token");
 
 
 	export let name="RON Account";
@@ -18,7 +21,8 @@
     export let balance="5425";
     export let iban="RONFOX62188921";
     export let isExpanded=false;
-    export let transactions=[];
+    let transactions=[];
+    export let accountId;
 
     let copied = false;
 
@@ -42,6 +46,7 @@
         dispatch("createPopup",{
             type: 'send_money',
             account: {
+                id: accountId,
                 type: name,
                 currency,
                 balance,
@@ -49,6 +54,15 @@
             }
         });
     }
+
+    onMount( () => {
+        gettransactions($token, accountId).then( result => {
+            if(result.status == "success") {
+                transactions = result.transactions;
+                transactions.sort((e1, e2) => new Date(e2.datetime) - new Date(e1.datetime));
+            }
+        });
+    })
 </script>
 
  
@@ -80,18 +94,27 @@
                     
                             <DetailField class="my-3 py-1 flex-shrink min-w-transaction">   
                                 <div class='font-sans text-gray-50 mt-2 mx-4 border-b-1'>
-                                    <h3 class="inline mr-3">{transaction.title}: </h3>
-                                    <span class="text-4xl {transaction.type == "send" ?  "text-red-c" : "text-lime-c"}">{transaction.amount}</span>
-                                    <span class="text-4xl">{currency}</span>
+                                    {#if transaction.transactionType == "send_transfer"}
+                                        <h3 class="inline mr-3">Sent money: </h3>
+                                    {:else if transaction.transactionType == "receive_transfer"}
+                                        <h3 class="inline mr-3">Received money: </h3>
+                                    {:else if transaction.transactionType == "card_payment"}
+                                        <h3 class="inline mr-3">{transaction.otherParty.store}: </h3>
+                                    {:else if transaction.transactionType == "fee"}
+                                        <h3 class="inline mr-3">Fees: </h3>
+                                    {/if}
+                                
+                                    <span class="text-4xl {transaction.transactionType == "receive_transfer" ? "text-lime-c" : "text-red-c"}">{amountToString(transaction.extra.amount)}</span>
+                                    <span class="text-4xl">{transaction.extra.currency}</span>
                                 </div>
                                 <div class='font-sans text-2xl text-gray-100 mt-2 mx-6 border-b-1'>
-                                    <p class="inline">at {transaction.time} </p>
+                                    <p class="inline">at {new Date(transaction.datetime).toLocaleString()} </p>
 
-                                    {#if transaction.status == "PROCESSED"}
+                                    {#if transaction.status == "processed"}
                                         <span>
                                             <Icon class="inline mb-1" icon="akar-icons:circle-check" color="#6DE25ACC"/>
                                         </span>
-                                    {:else if  transaction.status == "PENDING"}
+                                    {:else if  transaction.status == "pending"}
                                         <span>
                                             <Icon class="inline mb-1" icon="akar-icons:arrow-cycle" color="#F6AF43"/>
                                         </span>
@@ -114,18 +137,27 @@
                 {:else if transactions.length > 0}
                     <DetailField class="my-3 py-2  flex-shrink min-w-transaction">   
                         <div class='font-sans text-gray-50 mt-2 mx-4 border-b-1'>
-                            <h3 class="inline mr-3">{transactions[0].title}: </h3>
-                            <span class="text-4xl {transactions[0].type == "send" ?  "text-red-c" : "text-lime-c"}">{transactions[0].amount}</span>
-                            <span class="text-4xl">{currency}</span>
+                            {#if transactions[0].transactionType == "send_transfer"}
+                                <h3 class="inline mr-3">Sent money: </h3>
+                            {:else if transactions[0].transactionType == "receive_transfer"}
+                                <h3 class="inline mr-3">Received money: </h3>
+                            {:else if transactions[0].transactionType == "card_payment"}
+                                <h3 class="inline mr-3">{transactions[0].otherParty.store}: </h3>
+                            {:else if transactions[0].transactionType == "fee"}
+                                <h3 class="inline mr-3">Fees: </h3>
+                            {/if}
+
+                            <span class="text-4xl {transactions[0].transactionType == "receive_transfer" ? "text-lime-c" : "text-red-c"}">{amountToString(transactions[0].extra.amount)}</span>
+                            <span class="text-4xl">{transactions[0].extra.currency}</span>
                         </div>
                         <div class='font-sans text-2xl text-gray-100 mt-2 mx-6 border-b-1'>
-                        <p class="inline">at {transactions[0].time} </p>
+                        <p class="inline">at {new Date(transactions[0].datetime).toLocaleString()} </p>
 
-                            {#if transactions[0].status == "PROCESSED"}
+                            {#if transactions[0].status == "processed"}
                                 <span>
                                     <Icon class="inline mb-1" icon="akar-icons:circle-check" color="#6DE25ACC"/>
                                 </span>
-                            {:else if  transactions[0].status == "PENDING"}
+                            {:else if  transactions[0].status == "pending"}
                                 <span>
                                     <Icon class="inline mb-1" icon="akar-icons:arrow-cycle" color="#F6AF43"/>
                                 </span>

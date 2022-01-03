@@ -112,45 +112,6 @@ export async function getaccounttypes() {
     }
 }
 
-
-export async function getnotificationlist(token) {
-    try {
-        const result = await fetch(new URL("/notifications", baseURL), {
-            method: "GET",
-            headers: {
-                "Content-Type": "application/json",
-                "Authorization": "Bearer " + token,
-            },
-        });
-
-        return (await result.json());
-    } catch (error) {
-        return {
-            status: "error",
-            code: "request/failure"
-        }
-    }
-}
-
-export async function gettransactions(token, id) {
-    try {
-        const result = await fetch(new URL("/transactions?accountId="+id, baseURL), {
-            method: "GET",
-            headers: {
-                "Content-Type": "application/json",
-                "Authorization": "Bearer " + token,
-            },
-        });
-
-        return (await result.json());
-    } catch (error) {
-        return {
-            status: "error",
-            code: "request/failure"
-        }
-    }
-}
-
 export async function createaccount(token, name, currency, type) {
     try {
         const result = await fetch(new URL("/accounts/", baseURL), {
@@ -175,12 +136,32 @@ export async function createaccount(token, name, currency, type) {
     }
 }
 
-export async function createnotification(token, body, datetime) {
+export async function getnotificationlist(token) {
     try {
-        const result = await fetch(new URL("/notification/create", baseURL), {
+        const result = await fetch(new URL("/notifications/", baseURL), {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": "Bearer " + token,
+            },
+        });
+
+        return (await result.json());
+    } catch (error) {
+        return {
+            status: "error",
+            code: "request/failure"
+        }
+    }
+}
+
+export async function createnotification(token, body, read) {
+    try {
+        const result = await fetch(new URL("/notifications/", baseURL), {
             method: "POST",
             body: JSON.stringify({
-                body, datetime,
+                body: body, 
+                read: read,
             }),
             headers: {
                 "Content-Type": "application/json",
@@ -197,13 +178,55 @@ export async function createnotification(token, body, datetime) {
     }
 }
 
-export async function createtransaction(token, otherparty, amount, type, ) {
+export async function marknotificationread(token, id) {
     try {
-        const result = await fetch(new URL("/transaction/create", baseURL), {
+        const result = await fetch(new URL("/notifications/"+id+"/mark_read", baseURL), {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": "Bearer " + token,
+            },
+        });
+
+        return (await result.json());
+    } catch (error) {
+        return {
+            status: "error",
+            code: "request/failure"
+        }
+    }
+}
+
+export async function createtransaction(token, otherparty, amount, accountId, description) {
+    try {
+        const result = await fetch(new URL("/transactions/", baseURL), {
             method: "POST",
             body: JSON.stringify({
-                otherparty, amount, type,
+                description: description,
+                account_id: accountId,
+                destination_iban: otherparty, 
+                amount: amount, 
             }),
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": "Bearer " + token,
+            },
+        });
+
+        return (await result.json());
+    } catch (error) {
+        return {
+            status: "error",
+            code: "request/failure"
+        }
+    }
+}
+
+    
+export async function gettransactions(token, id) {
+    try {
+        const result = await fetch(new URL("/transactions/?account_id="+id, baseURL), {
+            method: "GET",
             headers: {
                 "Content-Type": "application/json",
                 "Authorization": "Bearer " + token,

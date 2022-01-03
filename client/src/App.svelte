@@ -1,7 +1,7 @@
 <script>
 	import { onMount, setContext } from "svelte";
 	import { writable, readable } from "svelte/store";
-	import { whoami, createnotification, getaccountlist } from "./api";
+	import { whoami, createnotification, getaccountlist, getnotificationlist } from "./api";
 
 	import BottomBorder from "./BottomBorder.svelte";
 	import CheckNotifications from "./CheckNotifications.svelte";
@@ -62,6 +62,44 @@
 
 	setContext("accounts", accounts);
 
+	const refreshNotifications = writable(null);
+	setContext("refreshNotifications", refreshNotifications);
+
+	const notifications = readable(null, set=> {
+		function getNotifications(token){
+			if(token==null){
+				set(null);
+			}else{
+				getnotificationlist(token)
+					.then(result => {
+						set(result);
+					})
+			}
+		}
+
+		let token = null;
+
+		refreshNotifications.set( () => {
+			getNotifications(token);
+		});
+
+		const unsubscribe = userToken.subscribe(newToken => {
+			token = newToken;
+			getNotifications(token);
+		})
+
+		const intervalId = setInterval(() => {
+			getNotifications(token);
+		}, 10000);
+
+		return () => {
+			unsubscribe();
+			clearInterval(intervalId);
+		}
+	})
+
+	setContext("notifications", notifications);
+
 	let isCreatingAccount = false;
 	let isCheckingNotifications = false;
 	let isSendingMoney = false;
@@ -116,7 +154,6 @@
 			break;
 
 			case "check_notifications":
-				notifications = event.detail.notifications;
 				isCheckingNotifications = true;
 			break;
 
@@ -146,7 +183,7 @@
 			{:else if  isCheckingNotifications}
 				<Overlay>
 					<div class="flex items-center justify-center h-full">
-						<CheckNotifications on:createPopup={onCreatePopup} notifications={notifications}></CheckNotifications>
+						<CheckNotifications on:createPopup={onCreatePopup}></CheckNotifications>
 					</div>
 				</Overlay>
 			{:else if  isSendingMoney}
