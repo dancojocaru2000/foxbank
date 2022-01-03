@@ -1,4 +1,5 @@
 from functools import wraps
+import json
 import sys
 from types import ModuleType
 
@@ -85,7 +86,19 @@ class Module(ModuleType):
             ''', (user_id,))
         else:
             cur.execute('select id, iban, currency, account_type, custom_name from accounts')
-        return [models.Account.from_query(q) for q in cur.fetchall()]
+        accounts = [models.Account.from_query(q) for q in cur.fetchall()]
+
+        for account in accounts:
+            cur.execute(
+                'select balance from V_account_balance where account_id = ?',
+                (account.id,),
+            )
+
+            result = cur.fetchone()
+            if result is not None:
+                account.balance = result['balance']
+
+        return accounts
 
 
     @get_db
@@ -106,7 +119,18 @@ class Module(ModuleType):
         result = cur.fetchone()
         if result is None:
             return None
-        return models.Account.from_query(result)
+        account = models.Account.from_query(result)
+
+        cur.execute(
+            'select balance from V_account_balance where account_id = ?',
+            (account.id,),
+        )
+
+        result = cur.fetchone()
+        if result is not None:
+            account.balance = result['balance']
+
+        return account
 
 
     @get_db
@@ -157,5 +181,130 @@ class Module(ModuleType):
         )
 
         self.db.commit()
+
+    @get_db
+    def get_transactions(self, account_id: int) -> list[models.Transaction]:
+        cur = self.db.cursor()
+        cur.execute(
+            'select transaction_id from accounts_transactions where account_id = ?',
+            (account_id,),
+        )
+
+        transactions = []
+        for tid in (row['transaction_id'] for row in cur.fetchall()):
+            cur.execute(
+                'select * from transactions where id = ?',
+                (tid,),
+            )
+
+            db_res = cur.fetchone()
+            if db_res is None:
+                continue
+            transactions.append(models.Transaction.from_query(db_res))
+
+        return transactions
+
+    @get_db
+    def insert_transaction(self, account_id: int, transaction: models.Transaction):
+        cur = self.db.cursor()
+        cur.execute(
+            'insert into transactions(datetime, other_party, status, type, extra) values (?, ?, ?, ?, ?)',
+            (
+                transaction.date_time.isoformat(),
+                json.dumps(transaction.other_party),
+                transaction.status,
+                transaction.transaction_type,
+                json.dumps(transaction.extra),
+            ),
+        )
+
+        cur.execute(
+            'select id from transactions where datetime = ? and other_party = ? and status = ? and type = ? and extra = ?',
+            (
+                transaction.date_time.isoformat(),
+                json.dumps(transaction.other_party),
+                transaction.status,
+                transaction.transaction_type,
+                json.dumps(transaction.extra),
+            ),
+        )
+        transaction.id = cur.fetchone()['id']
+
+        cur.execute(
+            'insert into accounts_transactions(account_id, transaction_id) values (?, ?)',
+            (account_id, transaction.id),
+        )
+
+        self.db.commit()
+
+    @get_db
+    def get_notifications(self, user_id: int) -> list[models.Notification]:
+        cur = self.db.cursor()
+
+        cur.execute(
+            '''
+            select n.id, n.body, n.datetime, n.read
+            from notifications as n
+            inner join users_notifications on n.id = users_notifications.notification_id
+            where users_notifications.user_id = ?
+            ''',
+            (user_id,),
+        )
+
+        return [models.Notification.from_query(q) for q in cur.fetchall()]
+
+    @get_db
+    def insert_notification(self, user_id: int, notification: models.Notification):
+        cur = self.db.cursor()
+
+        cur.execute(
+            'insert into notifications(body, datetime, read) values (?, ?, ?)',
+            (
+                notification.body,
+                notification.date_time.isoformat(),
+                1 if notification.read else 0,
+            ),
+        )
+
+        cur.execute(
+            'select id from notifications where body = ? and datetime = ? and read = ?',
+            (
+                notification.body,
+                notification.date_time.isoformat(),
+                1 if notification.read else 0,
+            ),
+        )
+        notification.id = cur.fetchone()['id']
+
+        cur.execute(
+            'insert into users_notifications values (?, ?)',
+            (user_id, notification.id,),
+        )
+
+        self.db.commit()
+
+    @get_db
+    def whose_notification(self, notification: int | models.Notification) -> int | None:
+        try:
+            notification_id = notification.id
+        except AttributeError:
+            notification_id = notification
+
+        cur = self.db.cursor()
+        cur.execute('select user_id from users_notifications where notification_id = ?', (notification_id,))
+        result = cur.fetchone()
+        if not result:
+            return None
+        return result[0]
+
+    @get_db
+    def mark_notification_as_read(self, notification_id: int):
+        cur = self.db.cursor()
+        cur.execute(
+            'update notifications set read = 1 where id = ?',
+            (notification_id,),
+        )
+        self.db.commit()
+
 
 sys.modules[__name__] = Module(__name__)

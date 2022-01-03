@@ -1,6 +1,30 @@
 from .string import str_range_replace
 
 
+IBAN_BANKS = {
+    'RO': {
+        'NBOR': 'BANCA NATIONALA A ROMANIEI',
+        'BUCU': 'ALPHA BANK ROMANIA SA',
+        'CARP': 'BANCA COMERCIALA CARPATICA SA',
+        'RNCB': 'BANCA COMERCIALA ROMANA SA',
+        'BRDE': 'BANCA ROMANA PENTRU DEZVOLTARE',
+        'BRMA': 'BANCA ROMANEASCA SA',
+        'BTRL': 'BANCA TRANSILVANIA SA',
+        'DAFB': 'BANK LEUMI ROMANIA SA',
+        'CECE': 'CASA DE ECONOMII SI CONSEMNATIUNI CEC SA',
+        'CITI': 'CITIBANK ROMANIA SA',
+        'UGBI': 'GARANTIBANK INTERNATIONAL NV - SUCURSALA ROMANIA',
+        'INGB': 'ING BANK NV',
+        'BREL': 'LIBRA BANK SA',
+        'BNRB': 'OTP BANK ROMANIA SA',
+        'RZBR': 'RAIFFEISEN BANK SA',
+        'TREZ': 'TREZORERIA STATULUI',
+        'BACX': 'UNICREDIT BANK SA',
+        'FOXB': 'FOXBANK',
+    },
+}
+
+
 def c_to_iban_i(c: str) -> int:
     a = ord(c)
     if a in range(48, 58):

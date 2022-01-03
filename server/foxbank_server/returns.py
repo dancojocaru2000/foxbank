@@ -61,6 +61,20 @@ UNAUTHORIZED = _make_error(
     "You are logged in but the resource you're trying to access isn't available to you",
 )
 
+# Transactions
+
+NO_BALANCE = _make_error(
+    _HTTPStatus.BAD_REQUEST,
+    'transaction/no_balance',
+    'Not enough balance to make the transaction',
+)
+
+INVALID_IBAN = _make_error(
+    _HTTPStatus.BAD_REQUEST,
+    'transaction/invalid_iban',
+    'Recipient IBAN is invalid',
+)
+
 
 # Success
 
@@ -74,15 +88,15 @@ def success(http_status: Any = _HTTPStatus.OK, /, **kargs):
 
 # Schemas
 
-from marshmallow import Schema, fields
+from marshmallow import Schema, fields, validate
 
 class ErrorSchema(Schema):
-    status = fields.Constant('error')
+    status = fields.Str(default='error', validate=validate.Equal('error'))
     code = fields.Str()
     message = fields.Str(required=False)
 
 class SuccessSchema(Schema):
-    status = fields.Constant('success')
+    status = fields.Str(default='success', validate=validate.Equal('success'))
 
 # smorest
 

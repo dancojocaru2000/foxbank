@@ -67,7 +67,7 @@ class WhoAmI(MethodView):
     def get(self):
         """Get information about currently logged in user"""
         user: User | None = get_user(user_id=decorators.user_id)
-        if user is not None:
-            user = user.to_json()
+        # if user is not None:
+        #     user = user.to_json()
 
         return returns.success(user=user)
