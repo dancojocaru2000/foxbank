@@ -6,8 +6,8 @@
     import GreenButton from './GreenButton.svelte';
     import { fade, fly, slide } from 'svelte/transition';
 	import { flip } from 'svelte/animate';
-    import { logout, whoami, getaccountlist, getnotificationlist } from './api';
-import { amountToString } from './utils';
+    import { logout, whoami, getaccountlist, getnotificationlist, getForex } from './api';
+    import { amountToString } from './utils';
 
     const token = getContext("token");
     const user = getContext("user");
@@ -20,7 +20,7 @@ import { amountToString } from './utils';
     $: username = $user.user.username;
     $: email = $user.user.email;
     $: notifications = $notificationsStore ? $notificationsStore.notifications : [];
-    let totalbalance = "2455.22";
+    let totalbalance = "0.00";
     let maincurrency = "RON";
     let expandedAccount = null;
     let showAllAccounts = true;
@@ -30,12 +30,21 @@ import { amountToString } from './utils';
         return {
             name: account.customName ? account.customName : `${account.accountType} Account`,
             currency: account.currency,
-            balance: amountToString(account.balance),
+            balance: account.balance,
             iban: account.iban.replace(/(.{4})/g, "$1 "),
             id: account.id,
+            transactions: account.transactions,
         }
     }) : [];
 
+    $: {
+        Promise.all(accounts.map(account => {
+            return getForex(account.currency, maincurrency, account.balance);
+        })).then( balances => {
+            const sum = balances.reduce((acc, current) => acc+current, 0);
+            totalbalance = amountToString(Math.round(sum));
+        })
+    }
 
     function dispatchLogout(){
         if (confirm("Log out?")) {
@@ -92,7 +101,7 @@ import { amountToString } from './utils';
         {/if}
 
         <div class="self-center m-0">
-            {#if showAllAccounts}
+            {#if showAllAccounts && (accounts.length < 3) }
                 <div in:slide={{delay:500*accounts.length, duration:250*accounts.length}}>
                     <GreenButton on:click={createAccount}><Icon icon="akar-icons:plus" color="rgba(249, 250, 251, 1)" width="26" height="26" /></GreenButton>
                 </div>

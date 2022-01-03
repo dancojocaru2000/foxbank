@@ -42,21 +42,39 @@
 	})
 
 	setContext("user", user);
+	const refreshAccounts = writable(null);
+	setContext("refreshAccounts", refreshAccounts);
 
 	const accounts = readable(null, set => {
-		const unsubscribe = userToken.subscribe(token => {
-			if(token == null) {
+		function getAccounts(token){
+			if(token==null){
 				set(null);
 			}else{
-				getaccountlist(token) 
-					.then(result =>{
+				getaccountlist(token)
+					.then(result => {
 						set(result);
 					})
 			}
+		}
+
+		let token = null;
+
+		refreshAccounts.set( () => {
+			getAccounts(token);
+		});
+
+		const unsubscribe = userToken.subscribe(newToken => {
+			token = newToken;
+			getAccounts(token);
 		})
+
+		const intervalId = setInterval(() => {
+			getAccounts(token);
+		}, 10000);
 
 		return () => {
 			unsubscribe();
+			clearInterval(intervalId);
 		}
 	})
 

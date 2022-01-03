@@ -12,6 +12,7 @@
     import { getContext } from "svelte";
 
     const token = getContext("token");
+    const refreshAccounts = getContext("refreshAccounts");
     
     const dispatch = createEventDispatcher();
 
@@ -32,6 +33,9 @@
             const result = await createaccount($token, name, currency, type);
             if(result.status == "success") {
                 dispatch("createPopup",{type:"create_acc_success"});
+                if($refreshAccounts){
+                    $refreshAccounts();
+                }
             }else{
                 dispatch("createPopup",{type:"create_acc_failed", reason:"Failed to create account. Error:"+result.status});
             }

@@ -24,6 +24,19 @@
         
     }
 
+    async function enter(event) {
+        if (event.key === 'Enter') {
+            const result = await login(username, code);
+            if(result.status == "success") {
+                dispatch("loginSuccess",{
+                    token: result.token,
+                });
+            }else{
+                alert(result.code);
+            }
+        }
+    }
+
 </script>
 
 <main class="h-full">
@@ -35,11 +48,11 @@
             </div>
             
             <div class="m-3 flex-shrink">
-                <InputField placeholder="Code" isPassword={true} bind:value={code}></InputField>
+                <InputField on:keydown={enter} placeholder="Code" isPassword={true} bind:value={code}></InputField>
             </div>
 
             <div class="m-3 flex-shrink"> 
-                <OrangeButton on:click={checkLogin}>Login</OrangeButton>
+                <OrangeButton  on:click={checkLogin}>Login</OrangeButton>
             </div>
             
             <div class="flex-grow">
