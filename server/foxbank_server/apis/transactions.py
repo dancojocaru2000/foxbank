@@ -87,7 +87,11 @@ class TransactionsList(MethodView):
                         transaction_type='receive_transfer',
                         status='processed',
                         other_party={'iban': account.iban,},
-                        extra={'currency': account.currency, 'amount': -amount,},
+                        extra={
+                            'currency': account.currency,
+                            'amount': -amount,
+                            'description': description,
+                        },
                     )
                     insert_transaction(acc.id, reverse_transaction)
                     break
