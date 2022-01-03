@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timezone
 from flask.views import MethodView
 from flask_smorest import Blueprint
 from marshmallow import Schema, fields
@@ -41,7 +41,7 @@ class NotificationsList(MethodView):
 
         The usefulness of this endpoint is questionable besides debugging since it's a notification to self
         """
-        now = datetime.now()
+        now = datetime.now(timezone.utc).astimezone()
         notification = Notification.new_notification(body, now, read)
         insert_notification(decorators.user_id, notification)
         return returns.success(notification=notification)

@@ -60,6 +60,13 @@ create table users_notifications (
 	foreign key (notification_id) references notifications (id)
 );
 
+create table exchange (
+	id integer primary key autoincrement,
+	currency text not null,
+	to_ron real not null,
+	from_ron real not null
+);
+
 create view V_account_balance as
 select 
 	accounts_transactions.account_id as "account_id",
