@@ -100,7 +100,7 @@ class TransactionsList(MethodView):
                         date_time=date,
                         read=False,
                     )
-                    insert_notification(acc.id, notification)
+                    insert_notification(whose_account(acc.id), notification)
                     break
             else:
                 return returns.abort(returns.NOT_FOUND)
