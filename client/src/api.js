@@ -67,7 +67,18 @@ export async function getaccountlist(token) {
             },
         });
 
-        return (await result.json());
+        const data = await result.json();
+
+        if(data.status == "success"){
+            for(let i=0; i < data.accounts.length; i++){
+                const transactionsreq = await gettransactions(token, data.accounts[i].id);
+                if (transactionsreq.status == "success") {
+                    data.accounts[i].transactions = transactionsreq.transactions;
+                }
+            }
+        }
+
+        return data;
     } catch (error) {
         return {
             status: "error",
@@ -146,7 +157,12 @@ export async function getnotificationlist(token) {
             },
         });
 
-        return (await result.json());
+        const data = await result.json();
+        if(data.status == "success") {
+            data.notifications.sort((e1, e2) => new Date(e2.datetime) - new Date(e1.datetime));
+        }
+
+        return data;
     } catch (error) {
         return {
             status: "error",
@@ -233,11 +249,39 @@ export async function gettransactions(token, id) {
             },
         });
 
-        return (await result.json());
+        const data = await result.json();
+        if(data.status == "success") {
+            data.transactions.sort((e1, e2) => new Date(e2.datetime) - new Date(e1.datetime));
+        }
+
+        return data;
     } catch (error) {
         return {
             status: "error",
             code: "request/failure"
         }
+    }
+}
+
+
+    
+export async function getForex(from, to, amount) {
+    try {
+        const result = await fetch(new URL("/forex/"+from+"/"+to, baseURL), {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+            },
+        });
+
+        const data = await result.json();
+        if(data.status == "success") {
+            const exchanged = amount * data.rate;
+            return exchanged;
+        }
+
+        return null;
+    } catch (error) {
+        return null;
     }
 }

@@ -9,7 +9,7 @@
 </script>
 
 <main>
-	<input type={isPassword ? "password" : "text"} placeholder={placeholder} value={value} on:input={handleInput} class="placeholder-gray-300 p-3 text-gray-50 w-full text-3xl">
+	<input on:keydown type={isPassword ? "password" : "text"} placeholder={placeholder} value={value} on:input={handleInput} class="placeholder-gray-300 p-3 text-gray-50 w-full text-3xl">
 </main>
 
 <style>

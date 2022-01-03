@@ -20,6 +20,7 @@
     let amount=0.00;
     let description="";
     const token = getContext("token");
+    const refreshAccounts = getContext("refreshAccounts");
 
 
     async function create(){
@@ -36,6 +37,9 @@
             await createtransaction($token,  receiveriban, Math.round(amount*100), account.id, description).then( result => {
                 if(result.status == "success") {
                     dispatch("createPopup",{type:"send_money_success"});
+                    if($refreshAccounts){
+                        $refreshAccounts();
+                    }
                 }
             });
             

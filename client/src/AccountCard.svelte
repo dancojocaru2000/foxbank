@@ -21,7 +21,7 @@
     export let balance="5425";
     export let iban="RONFOX62188921";
     export let isExpanded=false;
-    let transactions=[];
+    export let transactions=[];
     export let accountId;
 
     let copied = false;
@@ -55,14 +55,6 @@
         });
     }
 
-    onMount( () => {
-        gettransactions($token, accountId).then( result => {
-            if(result.status == "success") {
-                transactions = result.transactions;
-                transactions.sort((e1, e2) => new Date(e2.datetime) - new Date(e1.datetime));
-            }
-        });
-    })
 </script>
 
  
@@ -82,7 +74,7 @@
 
             <div>
                 <DetailField class="p-1  flex-shrink">
-                    <h2 class='font-sans mt-3 mb-2 pl-2 text-4xl text-gray-50'>Balance: <span style="color: #264D59">{balance}</span>{currency}</h2>
+                    <h2 class='font-sans mt-3 mb-2 pl-2 text-4xl text-gray-50'>Balance: <span style="color: #264D59">{amountToString(balance)}</span>{currency}</h2>
                 </DetailField>
             </div>
 
