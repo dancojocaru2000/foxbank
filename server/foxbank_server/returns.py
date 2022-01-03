@@ -61,6 +61,20 @@ UNAUTHORIZED = _make_error(
     "You are logged in but the resource you're trying to access isn't available to you",
 )
 
+# Transactions
+
+NO_BALANCE = _make_error(
+    _HTTPStatus.BAD_REQUEST,
+    'transaction/no_balance',
+    'Not enough balance to make the transaction',
+)
+
+INVALID_IBAN = _make_error(
+    _HTTPStatus.BAD_REQUEST,
+    'transaction/invalid_iban',
+    'Recipient IBAN is invalid',
+)
+
 
 # Success
 

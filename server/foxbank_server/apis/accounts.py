@@ -49,7 +49,7 @@ def get_account_id(account_id: int):
         return returns.abort(returns.NOT_FOUND)
     if decorators.user_id != db_utils.whose_account(account):
         return returns.abort(returns.UNAUTHORIZED)
-    account = account.to_json()
+    # account = account.to_json()
     return returns.success(account=account)
 
 
@@ -65,7 +65,7 @@ def get_account_iban(iban: str):
         return returns.abort(returns.NOT_FOUND)
     if decorators.user_id != db_utils.whose_account(account):
         return returns.abort(returns.UNAUTHORIZED)
-    account = account.to_json()
+    # account = account.to_json()
     return returns.success(account=account)
 
 
@@ -84,7 +84,7 @@ class AccountsList(MethodView):
     @bp.doc(security=[{'Token': []}])
     @bp.arguments(CreateAccountParams, as_kwargs=True)
     @bp.response(200, CreateAccountResponseSchema)
-    @bp.response(HTTPStatus.UNPROCESSABLE_ENTITY, description='Invalid currency or account type')
+    @bp.response(422, returns.ErrorSchema, description='Invalid currency or account type')
     def post(self, currency: str, account_type: str, custom_name: str):
         """Create account"""
         if currency not in VALID_CURRENCIES:
@@ -94,7 +94,8 @@ class AccountsList(MethodView):
 
         account = Account(-1, '', currency, account_type, custom_name or '')
         db_utils.insert_account(decorators.user_id, account)
-        return returns.success(account=account.to_json())
+        # return returns.success(account=account.to_json())
+        return returns.success(account=account)
 
     class AccountsResponseSchema(returns.SuccessSchema):
         accounts = fields.List(fields.Nested(Account.AccountSchema))

@@ -1,4 +1,4 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from marshmallow import Schema, fields
 from datetime import datetime
 
@@ -51,6 +51,7 @@ class Account:
     currency: str
     account_type: str
     custom_name: str
+    balance: int = field(default=0)
 
     class AccountSchema(Schema):
         id = fields.Int(required=False)
@@ -58,6 +59,7 @@ class Account:
         currency = fields.Str()
         account_type = fields.Str(data_key='accountType')
         custom_name = fields.Str(data_key='customName')
+        balance = fields.Int()
 
     @staticmethod
     def new_account(currency: str, account_type: str, custom_name: str = '') -> 'Account':
@@ -75,6 +77,7 @@ class Account:
             'currency': self.currency,
             'accountType': self.account_type,
             'customName': self.custom_name,
+            'balance': self.balance,
         }
         if include_id:
             result['id'] = self.id
@@ -97,9 +100,10 @@ class Transaction:
     class TransactionSchema(Schema):
         id = fields.Int(required=False)
         date_time = fields.DateTime(data_key='datetime')
-        other_party = fields.Str(data_key='otherParty')
+        other_party = fields.Dict(keys=fields.Str(), values=fields.Raw(), data_key='otherParty')
+        status = fields.Str()
         transaction_type = fields.Str(data_key='transactionType')
-        extra = fields.Str()
+        extra = fields.Dict(keys=fields.Str(), values=fields.Raw())
 
     @staticmethod
     def new_transaction(date_time: datetime, other_party: str, status: str, transaction_type: str, extra: str = '') -> 'Account':
@@ -126,4 +130,14 @@ class Transaction:
 
     @classmethod
     def from_query(cls, query_result):
+        import json
+
+        query_result = list(query_result)
+        if type(query_result[1]) is str:
+            query_result[1] = datetime.fromisoformat(query_result[1])
+        if type(query_result[2]) is str:
+            query_result[2] = json.loads(query_result[2])
+        if type(query_result[5]) is str:
+            query_result[5] = json.loads(query_result[5])
+
         return cls(*query_result)

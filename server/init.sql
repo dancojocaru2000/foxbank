@@ -59,3 +59,11 @@ create table users_notifications (
 	foreign key (user_id) references users (id),
 	foreign key (notification_id) references notifications (id)
 );
+
+create view V_account_balance as
+select 
+	accounts_transactions.account_id as "account_id",
+	sum(json_extract(transactions.extra, '$.amount')) as "balance"
+from transactions
+inner join accounts_transactions on accounts_transactions.transaction_id = transactions.id
+group by accounts_transactions.account_id;
