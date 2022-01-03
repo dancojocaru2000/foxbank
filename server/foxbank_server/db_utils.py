@@ -306,5 +306,32 @@ class Module(ModuleType):
         )
         self.db.commit()
 
+    @get_db
+    def get_forex_rate(self, from_currency: str, to_currency: str) -> float | None:
+        cur = self.db.cursor()
+
+        if from_currency == 'RON' or to_currency == 'RON':
+            currency_pairs = [(from_currency, to_currency)]
+        else:
+            currency_pairs = [(from_currency, 'RON'), ('RON', to_currency)]
+
+        amount = 1.0
+        for currency_pair in currency_pairs:
+            to_select = 'to_ron'
+            if currency_pair[0] == 'RON':
+                to_select = 'from_ron'
+            cur.execute(
+                f'select {to_select} from exchange where currency = ?',
+                (currency_pair[1] if currency_pair[0] == 'RON' else currency_pair[0],),
+            )
+            rate = cur.fetchone()
+            if rate is None:
+                amount = None
+                break
+            rate = rate[0]
+            amount *= rate
+
+        return amount
+
 
 sys.modules[__name__] = Module(__name__)

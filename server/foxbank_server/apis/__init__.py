@@ -5,6 +5,7 @@ from .accounts import bp as acc_bp
 from .login import bp as login_bp
 from .transactions import bp as transactions_bp
 from .notifications import bp as notifications_bp
+from .forex import bp as forex_bp
 
 class ApiWithErr(Api):
     def handle_http_exception(self, error):
@@ -31,3 +32,4 @@ def init_apis(app: Flask):
     api.register_blueprint(acc_bp, url_prefix='/accounts')
     api.register_blueprint(transactions_bp, url_prefix='/transactions')
     api.register_blueprint(notifications_bp, url_prefix='/notifications')
+    api.register_blueprint(forex_bp, url_prefix='/forex')
