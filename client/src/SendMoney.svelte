@@ -3,37 +3,42 @@
 
     import CardBG from "./CardBG.svelte";
     import InputField from "./InputField.svelte";
-    import {createEventDispatcher} from 'svelte';
+    import {createEventDispatcher, getContext} from 'svelte';
     import Icon from "@iconify/svelte";
     import Overlay from "./Overlay.svelte";
     import TextareaField from "./TextareaField.svelte";
     import { fade, fly, slide } from 'svelte/transition';
 	import { flip } from 'svelte/animate';
+    import { createnotification, createtransaction } from "./api";
 
     
     const dispatch = createEventDispatcher();
 
-    export let account={type: "", currency:"", balance:0};
+    export let account={id: -1, type: "", currency:"", balance:0};
     let receivername="";
     let receiveriban="";
     let amount=0.00;
     let description="";
+    const token = getContext("token");
 
-    let send_details={receivername:"", receiveriban:"", amount:0, description:""};
 
-    function create(){
+    async function create(){
         if(receivername == "" || receivername == null) {
             alert("Receiver's name field can not be empty!");
         }else if(receiveriban == "" || receiveriban == null){
             alert("Receiver's iBan field can not be empty!");
-        }else if (amount > parseFloat(account.balance) ){
+        }else if (parseFloat(amount) > parseFloat(account.balance) ){
             alert("Not enough money in your account!");
         }else if (amount <= 0.00 ){
             alert("Insert a valid amount!");
         }else{
             //TODO Create account with provided details on the server
-            send_details={receivername:receivername, receiveriban:receiveriban, amount:amount, description:description}
-            dispatch("createPopup",{type:"send_money_success", send_details:{send_details}});
+            await createtransaction($token,  receiveriban, Math.round(amount*100), account.id, description).then( result => {
+                if(result.status == "success") {
+                    dispatch("createPopup",{type:"send_money_success"});
+                }
+            });
+            
         }
     }
 
@@ -63,7 +68,7 @@
             
             <div class="mx-1 flex-shrink">
                 <h2 class='font-sans text-2xl text-gray-50 mb-2 '>IBAN:</h2>
-                <InputField placeholder={account.currency +"-0000-0000-0000-0000"} isPassword={false} bind:value={receiveriban}></InputField>
+                <InputField placeholder={"RO00 FOXB 0"+account.currency +" 0000 0000 0000"} isPassword={false} bind:value={receiveriban}></InputField>
             </div>
     
             <div class="mx-1 flex-shrink">
