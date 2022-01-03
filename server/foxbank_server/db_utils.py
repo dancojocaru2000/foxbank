@@ -308,6 +308,9 @@ class Module(ModuleType):
 
     @get_db
     def get_forex_rate(self, from_currency: str, to_currency: str) -> float | None:
+        if from_currency == to_currency:
+            return 1.0
+
         cur = self.db.cursor()
 
         if from_currency == 'RON' or to_currency == 'RON':

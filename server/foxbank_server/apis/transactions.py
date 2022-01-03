@@ -6,7 +6,7 @@ from marshmallow import Schema, fields
 import re
 
 from ..decorators import ensure_logged_in
-from ..db_utils import get_transactions, get_account, get_accounts, insert_transaction, whose_account, insert_notification
+from ..db_utils import get_transactions, get_account, get_accounts, insert_transaction, whose_account, insert_notification, get_forex_rate
 from ..models import Account, Notification, Transaction
 from ..utils.iban import check_iban
 from .. import decorators, returns
@@ -82,15 +82,18 @@ class TransactionsList(MethodView):
         if destination_iban[4:8] == 'FOXB':
             for acc in get_accounts():
                 if destination_iban == acc.iban:
+                    rate = get_forex_rate(account.currency, acc.currency)
                     reverse_transaction = Transaction.new_transaction(
                         date_time=date,
                         transaction_type='receive_transfer',
                         status='processed',
                         other_party={'iban': account.iban,},
                         extra={
-                            'currency': account.currency,
-                            'amount': -amount,
+                            'currency': acc.currency,
+                            'amount': int(-amount * rate),
                             'description': description,
+                            'originalAmount': -amount,
+                            'originalCurrency': account.currency,
                         },
                     )
                     insert_transaction(acc.id, reverse_transaction)
