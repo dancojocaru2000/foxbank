@@ -2,8 +2,12 @@ from http import HTTPStatus
 from flask.views import MethodView
 from flask_smorest import Blueprint, abort
 from marshmallow import Schema, fields
+
+import re
+
 from ..decorators import ensure_logged_in
 from ..models import Account
+from ..utils.iban import check_iban
 from .. import decorators
 from .. import db_utils
 from .. import returns
@@ -19,6 +23,13 @@ class MetaCurrenciesSchema(returns.SuccessSchema):
 class MetaAccountTypesSchema(returns.SuccessSchema):
     account_types = fields.List(fields.Str(), data_key='accountTypes')
 
+class MetaValidateIbanParams(Schema):
+    iban = fields.Str()
+
+class MetaValidateIbanSchema(returns.SuccessSchema):
+    valid = fields.Bool()
+    formatted_iban = fields.Str(data_key='formattedIban', optional=True)
+
 @bp.get('/meta/currencies')
 @bp.response(200, MetaCurrenciesSchema)
 def get_valid_currencies():
@@ -31,6 +42,19 @@ def get_valid_currencies():
 def get_valid_account_types():
     """Get valid account types"""
     return returns.success(account_types=ACCOUNT_TYPES)
+
+
+@bp.get('/meta/validate_iban')
+@bp.arguments(MetaValidateIbanParams, location='query', as_kwargs=True)
+@bp.response(200, MetaValidateIbanSchema)
+def get_validate_iban(iban: str):
+    """Validate IBAN"""
+    iban = re.sub(r'\s', '', iban)
+    valid = len(iban) > 8 and re.match(r'^[A-Z]{2}[0-9]{2}', iban) is not None and check_iban(iban)
+    return returns.success(
+        valid=valid,
+        formatted_iban=re.sub(r'(.{4})', r'\1 ', iban) if valid else None,
+    )
 
 
 class AccountResponseSchema(returns.SuccessSchema):
