@@ -1,4 +1,4 @@
-from datetime import date, datetime
+from datetime import date, datetime, timezone
 from flask.views import MethodView
 from flask_smorest import Blueprint
 from marshmallow import Schema, fields
@@ -75,7 +75,7 @@ class TransactionsList(MethodView):
         if not check_iban(destination_iban):
             return returns.abort(returns.INVALID_IBAN)
 
-        date = datetime.now()
+        date = datetime.now(timezone.utc).astimezone()
 
         # Check if transaction is to another FoxBank account
         reverse_transaction = None
