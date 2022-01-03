@@ -70,7 +70,7 @@ class AccountResponseSchema(returns.SuccessSchema):
 
 @bp.get('/<int:account_id>')
 @ensure_logged_in
-@bp.response(401, returns.ErrorSchema, description='Login failure')
+@bp.response(401, returns.ErrorSchema, description='Login failure or not allowed')
 @bp.doc(security=[{'Token': []}])
 @bp.response(200, AccountResponseSchema)
 def get_account_id(account_id: int):

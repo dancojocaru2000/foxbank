@@ -231,10 +231,80 @@ class Module(ModuleType):
         transaction.id = cur.fetchone()['id']
 
         cur.execute(
-            'insert into accounts_transactions(account_id, transaction_id) VALUES (?, ?)',
+            'insert into accounts_transactions(account_id, transaction_id) values (?, ?)',
             (account_id, transaction.id),
         )
 
         self.db.commit()
+
+    @get_db
+    def get_notifications(self, user_id: int) -> list[models.Notification]:
+        cur = self.db.cursor()
+
+        cur.execute(
+            '''
+            select n.id, n.body, n.datetime, n.read
+            from notifications as n
+            inner join users_notifications on n.id = users_notifications.notification_id
+            where users_notifications.user_id = ?
+            ''',
+            (user_id,),
+        )
+
+        return [models.Notification.from_query(q) for q in cur.fetchall()]
+
+    @get_db
+    def insert_notification(self, user_id: int, notification: models.Notification):
+        cur = self.db.cursor()
+
+        cur.execute(
+            'insert into notifications(body, datetime, read) values (?, ?, ?)',
+            (
+                notification.body,
+                notification.date_time.isoformat(),
+                1 if notification.read else 0,
+            ),
+        )
+
+        cur.execute(
+            'select id from notifications where body = ? and datetime = ? and read = ?',
+            (
+                notification.body,
+                notification.date_time.isoformat(),
+                1 if notification.read else 0,
+            ),
+        )
+        notification.id = cur.fetchone()['id']
+
+        cur.execute(
+            'insert into users_notifications values (?, ?)',
+            (user_id, notification.id,),
+        )
+
+        self.db.commit()
+
+    @get_db
+    def whose_notification(self, notification: int | models.Notification) -> int | None:
+        try:
+            notification_id = notification.id
+        except AttributeError:
+            notification_id = notification
+
+        cur = self.db.cursor()
+        cur.execute('select user_id from users_notifications where notification_id = ?', (notification_id,))
+        result = cur.fetchone()
+        if not result:
+            return None
+        return result[0]
+
+    @get_db
+    def mark_notification_as_read(self, notification_id: int):
+        cur = self.db.cursor()
+        cur.execute(
+            'update notifications set read = 1 where id = ?',
+            (notification_id,),
+        )
+        self.db.commit()
+
 
 sys.modules[__name__] = Module(__name__)

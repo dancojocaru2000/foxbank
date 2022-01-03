@@ -106,7 +106,7 @@ class Transaction:
         extra = fields.Dict(keys=fields.Str(), values=fields.Raw())
 
     @staticmethod
-    def new_transaction(date_time: datetime, other_party: str, status: str, transaction_type: str, extra: str = '') -> 'Account':
+    def new_transaction(date_time: datetime, other_party: str, status: str, transaction_type: str, extra: str = '') -> 'Transaction':
         return Transaction(
             id=-1,
             date_time=date_time,
@@ -139,5 +139,37 @@ class Transaction:
             query_result[2] = json.loads(query_result[2])
         if type(query_result[5]) is str:
             query_result[5] = json.loads(query_result[5])
+
+        return cls(*query_result)
+
+@dataclass
+class Notification:
+    id: int
+    body: str
+    date_time: datetime
+    read: bool
+
+    class NotificationSchema(Schema):
+        id = fields.Int(required=False)
+        body = fields.Str()
+        date_time = fields.DateTime(data_key='datetime')
+        read = fields.Bool()
+
+    @staticmethod
+    def new_notification(body: str, date_time: datetime, read: bool = False) -> 'Notification':
+        return Notification(
+            id=-1,
+            body=body,
+            date_time=date_time,
+            read=read,
+        )
+
+    @classmethod
+    def from_query(cls, query_result):
+        query_result = list(query_result)
+        if type(query_result[2]) is str:
+            query_result[2] = datetime.fromisoformat(query_result[2])
+        if type(query_result[3]) is not bool:
+            query_result[3] = bool(query_result[3])
 
         return cls(*query_result)
