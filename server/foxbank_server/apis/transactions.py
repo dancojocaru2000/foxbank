@@ -6,8 +6,8 @@ from marshmallow import Schema, fields
 import re
 
 from ..decorators import ensure_logged_in
-from ..db_utils import get_transactions, get_account, get_accounts, insert_transaction, whose_account
-from ..models import Account, Transaction
+from ..db_utils import get_transactions, get_account, get_accounts, insert_transaction, whose_account, insert_notification
+from ..models import Account, Notification, Transaction
 from ..utils.iban import check_iban
 from .. import decorators, returns
 
@@ -94,6 +94,13 @@ class TransactionsList(MethodView):
                         },
                     )
                     insert_transaction(acc.id, reverse_transaction)
+                    formatted_iban = re.sub(r'(.{4})', r'\1 ', account.iban).strip()
+                    notification = Notification.new_notification(
+                        body=f'Transfer of {-amount // 100}.{-amount % 100:0>2} {account.currency} received from {formatted_iban} in your {acc.custom_name or acc.account_type} account.',
+                        date_time=date,
+                        read=False,
+                    )
+                    insert_notification(acc.id, notification)
                     break
             else:
                 return returns.abort(returns.NOT_FOUND)
