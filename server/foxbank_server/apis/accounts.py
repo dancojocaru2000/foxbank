@@ -24,7 +24,7 @@ class MetaAccountTypesSchema(returns.SuccessSchema):
     account_types = fields.List(fields.Str(), data_key='accountTypes')
 
 class MetaValidateIbanParams(Schema):
-    iban = fields.Str()
+    iban = fields.Str(example='RO15RZBR0000060021338765')
 
 class MetaValidateIbanSchema(returns.SuccessSchema):
     valid = fields.Bool()
@@ -59,7 +59,7 @@ def get_validate_iban(iban: str):
 
     return returns.success(
         valid=valid,
-        formatted_iban=re.sub(r'(.{4})', r'\1 ', iban) if valid else None,
+        formatted_iban=re.sub(r'(.{4})', r'\1 ', iban).strip() if valid else None,
         bank_name=bank_name if valid else None,
     )
 
@@ -103,9 +103,9 @@ def get_account_iban(iban: str):
 @bp.route('/')
 class AccountsList(MethodView):
     class CreateAccountParams(Schema):
-        currency = fields.String()
-        account_type = fields.String(data_key='accountType')
-        custom_name = fields.String(data_key='customName')
+        currency = fields.String(example='RON')
+        account_type = fields.String(data_key='accountType', example='Checking')
+        custom_name = fields.String(data_key='customName', example='Daily Spending')
 
     class CreateAccountResponseSchema(returns.SuccessSchema):
         account = fields.Nested(Account.AccountSchema)
