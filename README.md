@@ -8,7 +8,7 @@ The design is modular: the client and the server can be hosted independently. Th
 
 ### Client
 
-Make sure to change the `baseURL` in `client/src/api.js`. The `baseURL` should point to the address of the server.
+Make sure to change the `baseURL` in [`client/src/api.js`](client/src/api.js). The `baseURL` should point to the address of the server.
 
 ```js
 const baseURL = "https://foxbank-api.extras.dcdevelop.xyz";
@@ -53,7 +53,7 @@ export PORT=5000 # set port here
 docker-compose up -d
 ```
 
-Check the `server/run.sh` script for further reference.
+Check the [`server/run.sh`](server/run.sh) script for further reference.
 
 ---
 
