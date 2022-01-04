@@ -5,6 +5,7 @@ drop table if exists transactions;
 drop table if exists accounts_transactions;
 drop table if exists notifications;
 drop table if exists users_notifications;
+drop table if exists exchange;
 
 create table users (
 	id integer primary key autoincrement,
